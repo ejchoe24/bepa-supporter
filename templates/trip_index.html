@@ -113,7 +113,7 @@
     직원별 출근/퇴근 시간을 확인 및 수정해 주세요.
   </div>
 
-  <form method="post" action="{{ url_for('trip_times_save') }}">
+  <form method="post" action="{{ url_for('times_save') }}">
     <table>
       <thead>
         <tr>
@@ -124,7 +124,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for u in users %}
+        {% for u in emps %}
         <tr>
           <td>{{ u.name }}</td>
           <td>{{ u.employee_code }}</td>
