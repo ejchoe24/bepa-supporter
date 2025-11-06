@@ -55,7 +55,6 @@ def upload_trip():
 
     # ===== 엑셀에서 명단 추출 =====
     try:
-        # 멀티헤더 대응
         try:
             df_trip = pd.read_excel(trip_path, header=[0, 1])
             df_trip.columns = df_trip.columns.map(lambda x: x[0] if 'Unnamed' in str(x[1]) else x[1])
