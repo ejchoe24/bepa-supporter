@@ -29,8 +29,10 @@ def index():
 def trip_index():
     return render_template('trip_index.html')
 
+
 @app.route('/trip/upload', methods=['POST'])
 def upload_trip():
+    # 파일 유효성 확인
     if 'trip_file' not in request.files or 'tag_file' not in request.files:
         return 'No file part'
     
@@ -40,18 +42,32 @@ def upload_trip():
     if trip_file.filename == '' or tag_file.filename == '':
         return 'No selected file'
     
+    # 저장 경로 설정
     trip_path = os.path.join(app.config['UPLOAD_FOLDER'], 'trip.xlsx')
     tag_path = os.path.join(app.config['UPLOAD_FOLDER'], 'tag.xlsx')
 
     trip_file.save(trip_path)
     tag_file.save(tag_path)
 
+    # 세션에 경로 저장
     session['trip_path'] = trip_path
     session['tag_path'] = tag_path
 
-    # 명단 추출
-    df_trip = pd.read_excel(trip_path, header=[0, 1])
-    df_trip.columns = df_trip.columns.map(lambda x : x[0] if 'Unnamed' in str(x[1]) else x[1])
+    # ===== 엑셀에서 명단 추출 =====
+    try:
+        # 멀티헤더 대응
+        try:
+            df_trip = pd.read_excel(trip_path, header=[0, 1])
+            df_trip.columns = df_trip.columns.map(lambda x: x[0] if 'Unnamed' in str(x[1]) else x[1])
+        except Exception:
+            df_trip = pd.read_excel(trip_path)
+    except Exception as e:
+        return f"엑셀 파일을 읽는 중 오류가 발생했습니다: {e}"
+
+    # 사원코드 / 사원 컬럼 확인
+    if not set(['사원코드', '사원']).issubset(df_trip.columns):
+        return "엑셀 파일에 '사원코드' 또는 '사원' 컬럼이 없습니다."
+
     unique_emp = df_trip[['사원코드', '사원']].dropna().drop_duplicates()
 
     emps = []
@@ -62,8 +78,11 @@ def upload_trip():
             'start_time': '09:00',
             'end_time': '18:00'
         })
+
+    # 세션 저장
     session['trip_emp'] = emps
 
+    # 다음 페이지로 이동
     return redirect(url_for('emp_times'))
 
 
@@ -77,19 +96,25 @@ def emp_times():
 def times_save():
     emps = session.get("trip_emp", [])
     new_emps = []
+
     for e in emps:
         code = e["employee_code"]
         start = request.form.get(f"start_{code}", "09:00")
         end = request.form.get(f"end_{code}", "18:00")
+
         new_emps.append({
             "employee_code": code,
             "name": e["name"],
             "start_time": start,
             "end_time": end
         })
-    session["trip_users"] = new_emps
-    return redirect(url_for("process_trip_with_user_times"))
 
+    # 세션 업데이트
+    session["trip_emp"] = new_emps
+
+    # 임시 페이지로 이동 (아직 처리 라우트 없음)
+    return "근무시간 저장 완료! (이후 /trip/process 라우트에서 처리 연결 예정)"
+    # return redirect(url_for("process_trip_with_user_times"))  # 처리 페이지 존재 시 활성화
 
     # try:
     #     # 출장 신청 데이터 불러오기
