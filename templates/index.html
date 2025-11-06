@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>베파 서포터</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(to right, #e4e5e6, #ffffff);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            padding-top: 20px;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logo img {
+            width: 200px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 2.5rem; /* 크기 조정 */
+            color: #073D95;
+            font-weight: 700;
+            margin: 20px 0;
+            text-align: center;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .links a {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem; /* 크기 조정 */
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            background: linear-gradient(to right, #073D95, #1e6a91);
+            border-radius: 8px;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .links a:hover {
+            background: linear-gradient(to right, #1e6a91, #073D95);
+            border: 2px solid #073D95;
+            transform: translateY(-3px);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-align: center;
+        }
+
+        footer a {
+            color: #2980b9;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #1e6a91;
+        }
+
+        .info-box {
+            background: #f8f9fa;  /* 배경색 */
+            padding: 20px;  /* 내부 여백 */
+            border-radius: 10px;  /* 모서리 둥글게 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            text-align: center;  /* 텍스트 가운데 정렬 */
+            font-size: 1.1rem;  /* 글자 크기 */
+            color: #555;  /* 글자 색상 */
+            max-width: 600px;  /* 최대 너비 설정 */
+            min-width: 600px;
+            margin: 20px auto;  /* 상하 여백 + 가운데 정렬 */
+        }
+
+        .contact-info {
+            font-size: 0.9rem;
+            color: #555;
+            text-align: center;
+            margin-top: 0px;
+            font-weight: bold;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 800px) {
+            .logo img {
+                width: 100px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .links a {
+                font-size: 1.1rem;
+            }
+
+            footer {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="../static/logo.png" alt="Logo">
+        </div>
+    </header>
+
+    <h1>부산경제진흥원의 베스트파트너</h1>
+
+    <p class="info-box">
+        효율적인 업무를 위해 <strong>베파 서포터</strong>를 이용해보세요!<br>  
+        교육 및 관내여비 담당자를 위한 필수 도구를 제공합니다. 📌
+    </p>
+
+    <div class="links">
+        <a href="/edu">📚 교육 담당자 서포터</a>
+        <a href="/trip">🚗 관내여비 담당자 서포터</a>
+        <a href="/money">💸 숫자 한글 변환기</a>
+    </div>
+
+    <footer>
+        <p class="contact-info">※ 오류신고 및 개선의견 : 최은주 주임(ejchoe24@bepa.kr, 051-600-1312)</p>
+        <p>&copy; 2024 ejchoe24. All rights reserved. | Version 3.0</p>
+    </footer>
+</body>
+</html>

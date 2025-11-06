@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: bepa-supporter
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        value: supersecretkey
+    routes:
+      - type: http
+        source: /
+        targetPort: 5000
