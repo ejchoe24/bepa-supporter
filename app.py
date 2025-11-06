@@ -253,11 +253,9 @@ def process_trip():
             try: group.sort_values(by=['사원', '시작일'], inplace=True)
             except: group.sort_values(by=['사원'], inplace=True)
             
-            cols = ['부서', '사원', '직급', '신청일', '시작일', '종료일', '시작시간',
+            group = group[['부서', '사원', '직급', '신청일', '시작일', '종료일', '시작시간',
                     '종료시간', '일수', '신청시간', '외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)',
-                    '출장시간', '여비', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']
-            cols = [c for c in cols if c in group]
-            group = group[cols]
+                    '출장시간', '여비', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']]
             
             group.to_excel(file_path, index=False)
             files.append(file_path)
