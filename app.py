@@ -50,7 +50,7 @@ def upload_trip():
     session['tag_path'] = tag_path
 
     # 명단 추출
-    df_trip = pd.read_excel(trip_path, heder=[0, 1])
+    df_trip = pd.read_excel(trip_path, header=[0, 1])
     df_trip.columns = df_trip.columns.map(lambda x : x[0] if 'Unnamed' in str(x[1]) else x[1])
     unique_emp = df_trip[['사원코드', '사원']].dropna().drop_duplicates()
 
