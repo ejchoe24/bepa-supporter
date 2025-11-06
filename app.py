@@ -114,7 +114,7 @@ def times_save():
 
     # 임시 페이지로 이동 (아직 처리 라우트 없음)
     return "근무시간 저장 완료! (이후 /trip/process 라우트에서 처리 연결 예정)"
-    # return redirect(url_for("process_trip_with_user_times"))  # 처리 페이지 존재 시 활성화
+    # return redirect(url_for("process_trip_with_emp_times"))  # 처리 페이지 존재 시 활성화
 
     # try:
     #     # 출장 신청 데이터 불러오기

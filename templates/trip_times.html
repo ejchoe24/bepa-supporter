@@ -42,10 +42,10 @@
         </tr>
       </thead>
       <tbody>
-        {% for u in users %}
+        {% for e in emps %}
         <tr>
-          <td>{{ u.name }}</td>
-          <td>{{ u.employee_code }}</td>
+          <td>{{ e.name }}</td>
+          <td>{{ e.employee_code }}</td>
           <td>
             <input type="time" name="start_{{u.employee_code}}" value="{{ u.start_time or '09:00' }}" required>
           </td>
