@@ -129,7 +129,7 @@ def process_trip():
     # 2) 출장 신청 데이터 로드
     try:
         # 출장 신청 데이터 불러오기
-        df_trip = pd.read_excel(trip_path, heder=[0, 1])
+        df_trip = pd.read_excel(trip_path, header=[0, 1])
         df_trip.columns = df_trip.columns.map(lambda x : x[0] if 'Unnamed' in str(x[1]) else x[1])
 
         for col in ['근태항목', '결재상태', '부서']:
