@@ -91,62 +91,62 @@ def times_save():
     return redirect(url_for("process_trip_with_user_times"))
 
 
-    try:
-        # 출장 신청 데이터 불러오기
-        df_trip = pd.read_excel(trip_path, heder=[0, 1])
-        df_trip.columns = df_trip.columns.map(lambda x : x[0] if 'Unnamed' in str(x[1]) else x[1])
+    # try:
+    #     # 출장 신청 데이터 불러오기
+    #     df_trip = pd.read_excel(trip_path, heder=[0, 1])
+    #     df_trip.columns = df_trip.columns.map(lambda x : x[0] if 'Unnamed' in str(x[1]) else x[1])
 
-        # 필요한 컬럼만 추출
-        df_trip = df_trip[['부서', '사원코드', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', '종료시간', '일수',
-                           '신청시간', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']]
-        # 관내출장 추출
-        df_trip = df_trip[df_trip['근태항목']=='관내출장']
-        # 결재완료 추출
-        df_trip = df_trip[df_trip['결재상태'].str.startwith('결재완료')]
+    #     # 필요한 컬럼만 추출
+    #     df_trip = df_trip[['부서', '사원코드', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', '종료시간', '일수',
+    #                        '신청시간', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']]
+    #     # 관내출장 추출
+    #     df_trip = df_trip[df_trip['근태항목']=='관내출장']
+    #     # 결재완료 추출
+    #     df_trip = df_trip[df_trip['결재상태'].str.startwith('결재완료')]
 
-        # 부산경제진흥원 부서 검증
-        depts = df_trip['부서'].unique()
-        bepa = ['경영기획실', '청년사업단', '산업인력지원단', '소상공인지원단', '기업지원단', '글로벌사업추진단', '부원장', '기업옴부즈맨실', '임원']
-        for dept in depts:
-            if dept not in bepa:
-                raise ValueError("오류가 발생하였습니다. 데이터전략TF팀으로 문의 부탁드립니다.")
+    #     # 부산경제진흥원 부서 검증
+    #     depts = df_trip['부서'].unique()
+    #     bepa = ['경영기획실', '청년사업단', '산업인력지원단', '소상공인지원단', '기업지원단', '글로벌사업추진단', '부원장', '기업옴부즈맨실', '임원']
+    #     for dept in depts:
+    #         if dept not in bepa:
+    #             raise ValueError("오류가 발생하였습니다. 데이터전략TF팀으로 문의 부탁드립니다.")
         
 
-        # 태그 데이터 불러오기
-        df_tag = pd.read_excel(tag_path)
-        df_tag = df_tag[['태깅일자', '사원코드', '근태구분', '근무시간']]
+    #     # 태그 데이터 불러오기
+    #     df_tag = pd.read_excel(tag_path)
+    #     df_tag = df_tag[['태깅일자', '사원코드', '근태구분', '근무시간']]
 
-        # 외출/복귀 시간 계산
-        tag_cols = ['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']
-        df_trip[tag_cols] = [None] * 4
-        cols = ['사원코드', '부서', '시작일', '시작시간', '종료시간']
+    #     # 외출/복귀 시간 계산
+    #     tag_cols = ['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']
+    #     df_trip[tag_cols] = [None] * 4
+    #     cols = ['사원코드', '부서', '시작일', '시작시간', '종료시간']
 
-        for i in range(len(df_trip)):
-            # 변수 정의 및 초기화
-            id, dept, date, str_time, end_time = df_trip.iloc[i, df_trip.columns.get_indexer(cols)]
-            out_time, in_time, valid_out, valid_in = [None] * 4
+    #     for i in range(len(df_trip)):
+    #         # 변수 정의 및 초기화
+    #         id, dept, date, str_time, end_time = df_trip.iloc[i, df_trip.columns.get_indexer(cols)]
+    #         out_time, in_time, valid_out, valid_in = [None] * 4
 
-            # 태그 이력 추출
-            cond_date = df_tag['태깅일자'] == date
-            cond_id = df_tag['사원코드'] == id
-            df_cond = df_tag[cond_date & cond_id]
+    #         # 태그 이력 추출
+    #         cond_date = df_tag['태깅일자'] == date
+    #         cond_id = df_tag['사원코드'] == id
+    #         df_cond = df_tag[cond_date & cond_id]
 
-            # 외출 : 가장 늦게 찍은 기록
-            try:
-                out_time = df_cond[df_cond['근태구분']=='외출']['근무시간'].iloc[-1]
-            except IndexError:
-                pass
+    #         # 외출 : 가장 늦게 찍은 기록
+    #         try:
+    #             out_time = df_cond[df_cond['근태구분']=='외출']['근무시간'].iloc[-1]
+    #         except IndexError:
+    #             pass
 
-            # 복귀 : 가장 빨리 찍은 기록
-            try:
-                in_time = df_cond[df_cond['근태구분'] == '복귀']['근무시간'].iloc[0]
-            except IndexError:
-                pass
+    #         # 복귀 : 가장 빨리 찍은 기록
+    #         try:
+    #             in_time = df_cond[df_cond['근태구분'] == '복귀']['근무시간'].iloc[0]
+    #         except IndexError:
+    #             pass
 
-            # 신청시간과 태그시간이 겹치지 않는 경우
-            if out_time and in_time:
-                if (out_time > end_time) or (in_time < str_time):
-                    valid_out, valid_in = ['불인정'] * 2
-                    df_trip.iloc[i, df_trip.columns.get_indexer(tag_cols)] = out_time, in_time, valid_out, valid_in
+    #         # 신청시간과 태그시간이 겹치지 않는 경우
+    #         if out_time and in_time:
+    #             if (out_time > end_time) or (in_time < str_time):
+    #                 valid_out, valid_in = ['불인정'] * 2
+    #                 df_trip.iloc[i, df_trip.columns.get_indexer(tag_cols)] = out_time, in_time, valid_out, valid_in
 
-            # 출장 시작 9시 // 출장 종료 18시 
+    #         # 출장 시작 9시 // 출장 종료 18시 
