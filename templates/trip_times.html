@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>관내출장 근무시간 설정</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: center; }
+    th { background: #f3f4f6; }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .toggle {
+      position: relative; width: 44px; height: 24px; display: inline-block;
+    }
+    .toggle input{ opacity:0; width:0; height:0; }
+    .slider {
+      position:absolute; cursor:pointer; inset:0; background:#e5e7eb; transition:.2s; border-radius:999px;
+    }
+    .slider:before {
+      position:absolute; content:""; height:18px; width:18px; left:3px; top:3px; background:white; transition:.2s; border-radius:999px; box-shadow:0 1px 2px rgba(0,0,0,.15);
+    }
+    input:checked + .slider { background:#2563eb; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .actions { margin-top: 16px; display:flex; gap:10px; }
+    button { padding:10px 16px; border:0; border-radius:8px; background:#111827; color:white; cursor:pointer; }
+    .subtle { background:#6b7280; }
+  </style>
+</head>
+<body>
+  <h2>관내출장 근무시간 설정</h2>
+  <p>업로드된 인원에 대해 기본 출근/퇴근 시간을 확인·수정해 주세요. 토글을 켜면 기본값(09:00/18:00)으로 자동 지정됩니다.</p>
+
+  <form method="post" action="{{ url_for('trip_times_save') }}">
+    <table>
+      <thead>
+        <tr>
+          <th>사원</th>
+          <th>사원코드</th>
+          <th>출근시간</th>
+          <th>퇴근시간</th>
+          <th>기본값(09:00/18:00)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.name }}</td>
+          <td>{{ u.employee_code }}</td>
+          <td>
+            <input type="time" name="start_{{u.employee_code}}" value="{{ u.start_time or '09:00' }}" required>
+          </td>
+          <td>
+            <input type="time" name="end_{{u.employee_code}}" value="{{ u.end_time or '18:00' }}" required>
+          </td>
+          <td>
+            <label class="toggle">
+              <input type="checkbox" onchange="
+                const s=document.querySelector('input[name=&#39;start_{{u.employee_code}}&#39;]');
+                const e=document.querySelector('input[name=&#39;end_{{u.employee_code}}&#39;]');
+                if(this.checked){ s.value='09:00'; e.value='18:00'; }
+              ">
+              <span class="slider"></span>
+            </label>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <button type="submit">저장하고 처리하기</button>
+      <a class="subtle" href="{{ url_for('trip_index') }}"><button type="button" class="subtle">취소</button></a>
+    </div>
+  </form>
+</body>
+</html>
