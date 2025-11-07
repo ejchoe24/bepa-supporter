@@ -165,7 +165,7 @@ def process_trip():
 
             # 4) 외출/복귀 시간 계산 
             tag_cols = ['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']
-            df_trip[cols] = [None] * 4
+            df_trip[tag_cols] = [None] * 4
             cols = ['사원코드', '부서', '시작일', '시작시간', '종료시간']
 
             for i in range(len(df_trip)):
