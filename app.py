@@ -171,9 +171,18 @@ def upload_and_process_trip_files():
             gray_bg_format = workbook.add_format({'bg_color': '#D3D3D3'})
             
             # 서식 적용
-            worksheet.conditional_format(f'T2:T{max_row}', {'type': 'cell', 'criteria': 'equal to', 'value': '"시청"', 'format': red_format})
-            worksheet.conditional_format(f'K2:K{max_row}', {'type': 'blanks', 'format': gray_bg_format})
-            worksheet.conditional_format(f'L2:L{max_row}', {'type': 'blanks', 'format': gray_bg_format})
+            # 검사할 목록을 리스트로 만듦
+            targets = ['"부산시청"', '"부산시티호텔"'] # 엑셀 문자열이므로 내부에 따옴표 한번 더 필요
+
+            for target in targets:
+                worksheet.conditional_format(f'T2:T{max_row}', {
+                    'type': 'cell', 
+                    'criteria': 'equal to', 
+                    'value': target, 
+                    'format': red_format
+                })
+            worksheet.conditional_format(f'M2:K{max_row}', {'type': 'blanks', 'format': gray_bg_format})
+            worksheet.conditional_format(f'N2:L{max_row}', {'type': 'blanks', 'format': gray_bg_format})
             
             worksheet.set_column('A:X', 12)
 
