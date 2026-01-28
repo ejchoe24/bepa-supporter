@@ -167,22 +167,10 @@ def upload_and_process_trip_files():
             max_row = len(group) + 1
             
             # 서식
-            red_format = workbook.add_format({'font_color': 'red', 'bold': True})
             gray_bg_format = workbook.add_format({'bg_color': '#D3D3D3'})
-            
-            # 서식 적용
-            # 검사할 목록을 리스트로 만듦
-            targets = ['"부산시청"', '"부산시티호텔"'] # 엑셀 문자열이므로 내부에 따옴표 한번 더 필요
 
-            for target in targets:
-                worksheet.conditional_format(f'T2:T{max_row}', {
-                    'type': 'cell', 
-                    'criteria': 'equal to', 
-                    'value': target, 
-                    'format': red_format
-                })
-            worksheet.conditional_format(f'M2:K{max_row}', {'type': 'blanks', 'format': gray_bg_format})
-            worksheet.conditional_format(f'N2:L{max_row}', {'type': 'blanks', 'format': gray_bg_format})
+            worksheet.conditional_format(f'M2:M{max_row}', {'type': 'blanks', 'format': gray_bg_format})
+            worksheet.conditional_format(f'N2:N{max_row}', {'type': 'blanks', 'format': gray_bg_format})
             
             worksheet.set_column('A:X', 12)
 
@@ -191,7 +179,7 @@ def upload_and_process_trip_files():
     return render_template('trip_result.html', department_files=department_files)
 
 
-# 파일 다운로드 처리 (관내여비 관련)
+# 파일 다운로드 처리 (관내여비 관련) 
 @app.route('/trip/download/<file_name>')
 def download_trip_file(file_name):
     # 업로드 폴더 경로 설정
