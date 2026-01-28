@@ -20,6 +20,10 @@ def index():
 """
 =============== 관내여비 담당자 서포터 기능 ===============
 """
+@app.route('/trip')
+def trip_index():
+    return render_template('trip_index.html')
+
 @app.route('/trip/upload', methods=['POST'])
 def upload_and_process_trip_files():
     if 'trip_file' not in request.files or 'tag_file' not in request.files:
