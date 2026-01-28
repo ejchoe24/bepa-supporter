@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 담당자 서포터</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 기본 스타일 및 초기화 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 로고 스타일 */
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logo img {
+            width: 200px;
+            height: auto;
+        }
+
+        /* 메인 제목 */
+        h1 {
+            font-size: 3rem;
+            color: #073D95;
+            font-weight: 700;
+            margin: 40px 0 30px;
+            text-align: center;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            word-break: keep-all;
+        }
+
+        /* 공통 컨테이너 스타일 */
+        .instruction, form {
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* 안내 박스 스타일 */
+        .instruction {
+            padding: 25px;
+            background-color: #e1f5fe;
+            border: 1px solid #073D95;
+            text-align: justify;
+        }
+
+        .instruction h2 {
+            margin-top: 0;
+            color: #073D95;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .instruction p, .instruction li {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .instruction ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        /* 폼 스타일 */
+        form {
+            padding: 30px;
+            background-color: #ffffff;
+            text-align: left;
+        }
+
+        form h3 {
+            color: #073D95;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        /* 체크박스 스타일 개선 */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* 체크박스와 글자 사이 간격 */
+            margin-bottom: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #555;
+            transition: color 0.3s;
+        }
+
+        .checkbox-label:hover {
+            color: #073D95;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #073D95; /* 체크박스 색상 변경 (최신 브라우저용) */
+            cursor: pointer;
+        }
+
+        /* [커스텀] 파일 업로드 스타일 */
+        .file-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .file-box .upload-name {
+            display: inline-block;
+            height: 45px;
+            padding: 0 10px;
+            vertical-align: middle;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            width: 75%;
+            color: #999;
+            background-color: #f3f4f7;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .file-box label {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+            vertical-align: middle;
+            background-color: #95a5a6;
+            cursor: pointer;
+            height: 45px;
+            border-radius: 5px;
+            width: 25%;
+            box-sizing: border-box;
+            transition: background 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .file-box label:hover {
+            background-color: #073D95;
+        }
+
+        .file-box input[type="file"] {
+            position: absolute;
+            width: 0;
+            height: 0;
+            padding: 0;
+            overflow: hidden;
+            border: 0;
+        }
+
+        /* 업로드 버튼 */
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px 0;
+            color: white;
+            background-color: #073D95;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #1e6a91;
+            transform: translateY(-2px);
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-align: center;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .logo {
+                position: static;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            .logo img { width: 150px; }
+            h1 { font-size: 2rem; margin-top: 10px; }
+            form, .instruction { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="logo">
+        <img src="../static/logo.png" alt="Logo">
+    </header>
+
+    <h1>교육 담당자 서포터</h1>
+    
+    <div class="instruction">
+        <h2>CSV 파일 업로드 방법</h2>
+        <p>엑셀 파일의 "Raw Data" 시트를 CSV 파일로 변환 후 업로드해 주세요.</p>
+        <ol>
+            <li>엑셀 파일을 열고 Raw Data 시트를 선택합니다.</li>
+            <li>'파일' 메뉴에서 '다른 이름으로 저장'을 선택합니다.</li>
+            <li>'CSV(쉼표로 구분)' 형식을 선택하고 파일을 저장합니다.</li>
+            <li>이곳에서 변환한 CSV 파일을 선택하여 업로드합니다.</li>
+        </ol>
+    </div>
+
+    <form action="/edu/upload" method="post" enctype="multipart/form-data">
+        <h3>CSV 파일 업로드</h3>
+        
+        <label class="checkbox-label">
+            <input type="checkbox" name="include_date" value="yes">
+            <span>교육일시를 포함하여 중복된 데이터 확인</span>
+        </label>
+        
+        <div class="file-box">
+            <input class="upload-name" value="파일을 선택해주세요" placeholder="파일을 선택해주세요" readonly>
+            <label for="file">파일 찾기</label> 
+            <input type="file" id="file" name="file" required accept=".csv">
+        </div>
+
+        <button type="submit">업로드</button>
+    </form>
+
+    <footer>
+        <p>&copy; 2024 ejchoe24. All rights reserved. | Version 3.1</p>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        
+        if(fileInput) {
+            fileInput.addEventListener('change', function(){
+                let fileName;
+                if(this.files[0]) {
+                    fileName = this.files[0].name;
+                } else {
+                    fileName = "파일을 선택해주세요";
+                }
+                // 바로 위의 input 요소(파일명 표시용)에 값 넣기
+                this.parentNode.querySelector('.upload-name').value = fileName;
+            });
+        }
+    </script>
+</body>
+</html>
