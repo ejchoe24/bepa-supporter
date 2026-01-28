@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자 한글 변환기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 기본 설정 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 로고 스타일 */
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logo img {
+            width: 150px;
+            height: auto;
+        }
+
+        /* 메인 카드 컨테이너 */
+        .card-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative; /* 내부 요소 정렬 기준 */
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #073D95;
+            font-weight: 700;
+            margin: 0 0 30px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* 입력 폼 스타일 */
+        form {
+            width: 100%;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center; /* 숫자 가운데 정렬 */
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+            font-weight: 500;
+        }
+
+        input[type="text"]:focus {
+            border-color: #073D95;
+            box-shadow: 0 0 0 4px rgba(7, 61, 149, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            color: white;
+            background-color: #073D95;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(7, 61, 149, 0.2);
+        }
+
+        button:hover {
+            background-color: #1e6a91;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(7, 61, 149, 0.3);
+        }
+
+        /* 결과 박스 스타일 */
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #f0f7ff;
+            border: 1px solid #d0e3ff;
+            border-radius: 15px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease-in-out forwards;
+            position: relative;
+        }
+
+        .input-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .converted-value {
+            font-size: 1.6rem;
+            color: #073D95;
+            font-weight: 700;
+            margin-bottom: 10px;
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
+        }
+
+        /* 복사 버튼 */
+        .copy-btn {
+            background-color: white;
+            color: #555;
+            border: 1px solid #bdc3c7;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            box-shadow: none;
+            width: auto; /* 전체 너비 해제 */
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #073D95;
+            color: white;
+            border-color: #073D95;
+            transform: none;
+        }
+
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 푸터 */
+        footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .logo {
+                position: static;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            .card-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="logo">
+        <img src="../static/logo.png" alt="Logo">
+    </header>
+
+    <div class="card-container">
+        <h1>숫자 한글 변환기</h1>
+
+        <form method="post">
+            <div class="input-group">
+                <input type="text" name="number" id="numberInput" placeholder="숫자를 입력하세요 (예: 10000)" required autocomplete="off">
+            </div>
+            <button type="submit">한글로 변환하기</button>
+        </form>
+
+        {% if converted_value %}
+        <div class="result-container">
+            <div class="input-label">입력금액: {{ input_value }} 원</div>
+            <div class="converted-value" id="resultText">{{ converted_value }}</div>
+            
+            <button type="button" class="copy-btn" onclick="copyResult()">
+                <i class="fas fa-copy"></i> 결과 복사
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ejchoe24. All rights reserved. | Version 3.1</p>
+    </footer>
+
+    <script>
+        // 1. 입력 시 천 단위 콤마 자동 생성 기능
+        const input = document.getElementById('numberInput');
+        
+        if(input) {
+            input.addEventListener('keyup', function(e) {
+                let value = e.target.value;
+                // 숫자만 남기고 제거
+                value = Number(value.replaceAll(',', ''));
+                if(isNaN(value)) {
+                    // 숫자가 아니면 0으로 처리하거나 입력 막기 (여기서는 빈값)
+                    input.value = "";
+                } else {
+                    // 천 단위 콤마 포맷팅
+                    const formatValue = value.toLocaleString('ko-KR');
+                    input.value = formatValue;
+                }
+            });
+        }
+
+        // 2. 결과 텍스트 복사 기능
+        function copyResult() {
+            const resultText = document.getElementById('resultText').innerText;
+            
+            navigator.clipboard.writeText(resultText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalHTML = btn.innerHTML;
+                
+                // 버튼 텍스트 변경으로 피드백 제공
+                btn.innerHTML = '<i class="fas fa-check"></i> 복사 완료!';
+                btn.style.backgroundColor = '#073D95';
+                btn.style.color = 'white';
+                
+                // 1.5초 뒤 원래대로 복구
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.backgroundColor = 'white';
+                    btn.style.color = '#555';
+                }, 1500);
+            }).catch(err => {
+                alert('복사에 실패했습니다.');
+            });
+        }
+    </script>
+</body>
+</html>
