@@ -218,58 +218,6 @@ def upload_and_process_trip_files():
     return render_template('trip_result.html', department_files=department_files)
 
 
-        
-
-
-        
-        df_trip['외출태그(인정)'] = df_trip['외출태그(인정)'].fillna(df_trip['외출태그'])
-        df_trip['복귀태그(인정)'] = df_trip['복귀태그(인정)'].fillna(df_trip['복귀태그'])
-
-        df_trip['외출태그(인정)'] = df_trip['외출태그(인정)'].apply(lambda x : None if x=='불인정' else x)
-        df_trip['복귀태그(인정)'] = df_trip['복귀태그(인정)'].apply(lambda x : None if x=='불인정' else x)
-
-        # 출장시간 계산
-        df_trip['외출태그(산출)'] = pd.to_datetime(df_trip['외출태그(인정)'], format='%H:%M')
-        df_trip['복귀태그(산출)'] = pd.to_datetime(df_trip['복귀태그(인정)'], format='%H:%M')
-        
-        total_time = (df_trip['복귀태그(산출)'] - df_trip['외출태그(산출)'])
-        df_trip['출장시간(산출)/분'] = total_time.dt.total_seconds() // 60
-        df_trip['출장시간'] = total_time.apply(lambda x: None if pd.isna(x) else f'{x.components.hours}:{x.components.minutes:02d}')
-        
-        # 여비 계산
-        df_trip['여비'] = 0
-        for i in range(len(df_trip)):
-            car, time = df_trip.iloc[i, df_trip.columns.get_indexer(['교통수단', '출장시간(산출)/분'])]
-
-            if pd.isna(time): m = 0
-            elif time < 240: m = 10000
-            else: m = 20000
-
-            if car == '관용차량': m -= 10000
-            if m < 0: m = 0
-
-            df_trip.iloc[i, df_trip.columns.get_loc('여비')] = m
-        
-    except Exception as e:
-        return f"파일 처리 중 오류 발생: {str(e)}"
-    
-    # 부서별 엑셀 파일 저장
-    department_files = []
-    for dept, group in df_trip.groupby('부서'):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{dept}_관내여비.xlsx')
-        try:
-            group.sort_values(by=['사원', '시작일'], inplace=True)
-        except:
-            group.sort_values(by=['사원'], inplace=True)
-        group = group[['부서', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', 
-        '종료시간', '일수', '신청시간', '외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)',
-        '출장시간', '여비', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']]
-        group.to_excel(file_path, index=False)
-        department_files.append(file_path)
-
-    return render_template('trip_result.html', department_files=department_files)
-
-
 # 파일 다운로드 처리 (관내여비 관련)
 @app.route('/trip/download/<file_name>')
 def download_trip_file(file_name):
