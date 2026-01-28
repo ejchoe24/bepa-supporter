@@ -150,7 +150,7 @@ def upload_and_process_trip_files():
         return f"파일 처리 중 오류 발생: {str(e)}"
     
     # 5. 부서별 저장 및 서식 적용
-    files = []
+    department_files = []
     final_cols = ['부서', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', 
                   '종료시간', '일수', '신청시간', '외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)',
                   '출장시간', '여비', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']
@@ -177,9 +177,9 @@ def upload_and_process_trip_files():
             
             worksheet.set_column('A:X', 12)
 
-        files.append(file_path)
+        department_files.append(file_path)
 
-    return render_template('trip_result.html', files=files)
+    return render_template('trip_result.html', department_files=department_files)
 
 """
 =============== 숫자 한글 변환기 ===============
