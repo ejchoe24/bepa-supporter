@@ -77,7 +77,7 @@ def upload_and_process_trip_files():
             out_time = row['외출태그']
             in_time = row['복귀태그']
             
-            # [수정] 기본값: 태그가 있으면 일단 인정값으로 가져옴 (시간 포맷팅만 수행)
+            # 기본값: 태그가 있으면 일단 가져옴 (시간 포맷팅)
             if pd.notna(out_time): 
                 out_time = str(out_time)[:5]
                 out_use = out_time
@@ -90,7 +90,7 @@ def upload_and_process_trip_files():
             else:
                 in_use = None
 
-            # [수정] 로직 1: 신청시간과 태그시간 불일치 -> 그냥 None (빈칸) 반환
+            # [수정] 로직 1: 신청시간과 태그시간 불일치 -> None (빈칸) 반환
             if pd.notna(out_time) and pd.notna(in_time):
                 if (out_time > end_time) or (in_time < str_time):
                     return pd.Series([out_time, in_time, None, None]) 
@@ -111,9 +111,11 @@ def upload_and_process_trip_files():
         # 로직 적용
         df_trip[['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']] = df_trip.apply(apply_logic, axis=1)
         
-        # [삭제됨] fillna 코드를 삭제했습니다. (None인 상태로 둬야 0원 처리됨)
-
+        # [삭제됨] fillna 코드를 삭제했습니다. 
+        # 이유: 불일치라서 None이 된 경우, fillna가 있으면 다시 원래 태그값으로 채워져서 돈이 지급되어 버립니다.
+        
         # 4. 시간 및 여비 계산
+        # [수정] calc_out 대신 '외출태그(인정)'을 바로 사용합니다.
         out_dt = pd.to_datetime(df_trip['외출태그(인정)'], format='%H:%M', errors='coerce')
         in_dt = pd.to_datetime(df_trip['복귀태그(인정)'], format='%H:%M', errors='coerce')
         
@@ -131,7 +133,7 @@ def upload_and_process_trip_files():
 
         # 여비 계산
         conditions = [
-            df_trip['출장시간(산출)/분'].isna(),
+            df_trip['출장시간(산출)/분'].isna(), # 인정시간이 None이면 0원
             df_trip['출장시간(산출)/분'] < 240
         ]
         choices = [0, 10000]
@@ -140,6 +142,7 @@ def upload_and_process_trip_files():
         df_trip.loc[df_trip['교통수단'] == '관용차량', '여비'] -= 10000
         df_trip['여비'] = df_trip['여비'].clip(lower=0) 
 
+        # 불필요 컬럼 제거 (calc_out, calc_in은 애초에 안 만들었으니 제거 리스트에서도 뺌)
         df_trip.drop(columns=['태깅일자_x', '사원코드_x', '태깅일자_y', '사원코드_y'], inplace=True, errors='ignore')
 
     except Exception as e:
@@ -166,11 +169,8 @@ def upload_and_process_trip_files():
             red_format = workbook.add_format({'font_color': 'red', 'bold': True})
             gray_bg_format = workbook.add_format({'bg_color': '#D3D3D3'})
             
-            # 도착지 '시청' 강조
-            worksheet.conditional_format(f'T2:T{max_row}', {
-                'type': 'cell', 'criteria': 'equal to', 'value': '"시청"', 'format': red_format
-            })
-            # 태그 없음 회색
+            # 서식 적용
+            worksheet.conditional_format(f'T2:T{max_row}', {'type': 'cell', 'criteria': 'equal to', 'value': '"시청"', 'format': red_format})
             worksheet.conditional_format(f'K2:K{max_row}', {'type': 'blanks', 'format': gray_bg_format})
             worksheet.conditional_format(f'L2:L{max_row}', {'type': 'blanks', 'format': gray_bg_format})
             
