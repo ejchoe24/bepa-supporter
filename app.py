@@ -115,9 +115,6 @@ def upload_and_process_trip_files():
         # 로직 적용
         df_trip[['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']] = df_trip.apply(apply_logic, axis=1)
         
-        # [삭제됨] fillna 코드를 삭제했습니다. 
-        # 이유: 불일치라서 None이 된 경우, fillna가 있으면 다시 원래 태그값으로 채워져서 돈이 지급되어 버립니다.
-        
         # 4. 시간 및 여비 계산
         # [수정] calc_out 대신 '외출태그(인정)'을 바로 사용합니다.
         out_dt = pd.to_datetime(df_trip['외출태그(인정)'], format='%H:%M', errors='coerce')
@@ -146,14 +143,14 @@ def upload_and_process_trip_files():
         df_trip.loc[df_trip['교통수단'] == '관용차량', '여비'] -= 10000
         df_trip['여비'] = df_trip['여비'].clip(lower=0) 
 
-        # 불필요 컬럼 제거 (calc_out, calc_in은 애초에 안 만들었으니 제거 리스트에서도 뺌)
+        # 불필요 컬럼 제거
         df_trip.drop(columns=['태깅일자_x', '사원코드_x', '태깅일자_y', '사원코드_y'], inplace=True, errors='ignore')
 
     except Exception as e:
         return f"파일 처리 중 오류 발생: {str(e)}"
     
     # 5. 부서별 저장 및 서식 적용
-    department_files = []
+    files = []
     final_cols = ['부서', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', 
                   '종료시간', '일수', '신청시간', '외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)',
                   '출장시간', '여비', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']
@@ -180,9 +177,9 @@ def upload_and_process_trip_files():
             
             worksheet.set_column('A:X', 12)
 
-        department_files.append(file_path)
+        files.append(file_path)
 
-    return render_template('trip_result.html', department_files=department_files)
+    return render_template('trip_result.html', files=files)
 
 """
 =============== 숫자 한글 변환기 ===============
@@ -238,14 +235,3 @@ def money_converter():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-"""
-=============== 관내여비 담당자 서포터 기능 ===============
-"""
-
-@app.route('/system', methods=['GET', 'POST'])
-def system_index():
-    if request.method == 'POST':
-        # 신규 직원 정보 처리 로직 추가 예정
-        return '신규 직원 계정 생성 기능은 곧 제공될 예정입니다.'
-    return render_template('system_index.html')
