@@ -181,6 +181,17 @@ def upload_and_process_trip_files():
 
     return render_template('trip_result.html', department_files=department_files)
 
+
+# 파일 다운로드 처리 (관내여비 관련)
+@app.route('/trip/download/<file_name>')
+def download_trip_file(file_name):
+    # 업로드 폴더 경로 설정
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        return f'파일 {file_name}을 찾을 수 없습니다.'
+
 """
 =============== 숫자 한글 변환기 ===============
 """
