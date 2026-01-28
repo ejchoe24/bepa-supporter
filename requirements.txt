@@ -2,3 +2,5 @@ Flask
 pandas
 gunicorn
 openpyxl
+xlsxwriter
+numpy
