@@ -2,16 +2,19 @@ from flask import Flask, render_template, request, send_file # type: ignore
 import pandas as pd # type: ignore
 import os
 import re
-import warnings
 import numpy as np
+import warnings
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
-# 업로드 폴더 설정
+# 업로드 및 처리 폴더 설정
 UPLOAD_FOLDER = 'uploads'
+PROCESSED_FOLDER = 'processed'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 
 @app.route('/')
 def index():
@@ -168,10 +171,15 @@ def upload_and_process_trip_files():
             
             # 서식
             gray_bg_format = workbook.add_format({'bg_color': '#D3D3D3'})
+            red_text_format = workbook.add_format({'font_color': 'red'})
 
             worksheet.conditional_format(f'M2:M{max_row}', {'type': 'blanks', 'format': gray_bg_format})
             worksheet.conditional_format(f'N2:N{max_row}', {'type': 'blanks', 'format': gray_bg_format})
-            
+            worksheet.conditional_format(f'A2:X{max_row}', {
+                'type': 'formula',
+                'criteria': '=LEFT($J2, 1)="-"',
+                'format': red_text_format
+            })
             worksheet.set_column('A:X', 12)
 
         department_files.append(file_path)
@@ -193,9 +201,9 @@ def download_trip_file(file_name):
 =============== 숫자 한글 변환기 ===============
 """
 def number_to_korean(num):
-    num = int(re.sub(r'[,]', '', num))
-
-    units = ['', '만', '억', '조', '경']
+    num = int(re.sub(r'[,]', '', num))  # 숫자에서 콤마 제거 후 정수 변환
+    
+    units = ['', '만', '억', '조', '경']  
     small_units = ['', '십', '백', '천']  
     digits = [''] + list('일이삼사오육칠팔구')  
 

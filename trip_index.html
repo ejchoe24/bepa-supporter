@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교육 담당자 서포터</title>
+    <title>관내여비 계산기</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* 기본 스타일 및 초기화 */
@@ -21,7 +21,6 @@
             box-sizing: border-box;
         }
 
-        /* 로고 스타일 */
         .logo {
             position: absolute;
             top: 20px;
@@ -33,7 +32,6 @@
             height: auto;
         }
 
-        /* 메인 제목 */
         h1 {
             font-size: 3rem;
             color: #073D95;
@@ -44,7 +42,6 @@
             word-break: keep-all;
         }
 
-        /* 공통 컨테이너 스타일 */
         .instruction, form {
             width: 100%;
             max-width: 700px;
@@ -54,9 +51,8 @@
             margin-bottom: 20px;
         }
 
-        /* 안내 박스 스타일 */
         .instruction {
-            padding: 25px;
+            padding: 20px;
             background-color: #e1f5fe;
             border: 1px solid #073D95;
             text-align: justify;
@@ -66,13 +62,11 @@
             margin-top: 0;
             color: #073D95;
             font-size: 1.5rem;
-            margin-bottom: 15px;
         }
 
         .instruction p, .instruction li {
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.6;
-            color: #444;
         }
 
         .instruction ol {
@@ -80,50 +74,36 @@
             margin: 10px 0;
         }
 
-        /* 폼 스타일 */
+        .important-text {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
         form {
             padding: 30px;
             background-color: #ffffff;
             text-align: left;
         }
 
-        form h3 {
+        form h2 {
             color: #073D95;
             margin-top: 0;
             margin-bottom: 20px;
-            font-size: 1.3rem;
         }
 
-        /* 체크박스 스타일 개선 */
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px; /* 체크박스와 글자 사이 간격 */
-            margin-bottom: 25px;
-            cursor: pointer;
+        form p {
             font-size: 1rem;
-            font-weight: 500;
-            color: #555;
-            transition: color 0.3s;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #444;
         }
 
-        .checkbox-label:hover {
-            color: #073D95;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #073D95; /* 체크박스 색상 변경 (최신 브라우저용) */
-            cursor: pointer;
-        }
-
-        /* [커스텀] 파일 업로드 스타일 */
+        /* [변경] 파일 업로드 커스텀 스타일 시작 */
         .file-box {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            gap: 10px;
+            gap: 10px; /* 입력창과 버튼 사이 간격 */
         }
 
         .file-box .upload-name {
@@ -133,11 +113,10 @@
             vertical-align: middle;
             border: 1px solid #bdc3c7;
             border-radius: 5px;
-            width: 75%;
+            width: 75%; /* 입력창 너비 */
             color: #999;
             background-color: #f3f4f7;
             box-sizing: border-box;
-            font-size: 1rem;
         }
 
         .file-box label {
@@ -147,19 +126,18 @@
             padding: 10px 20px;
             color: #fff;
             vertical-align: middle;
-            background-color: #95a5a6;
+            background-color: #95a5a6; /* 기본 회색 */
             cursor: pointer;
             height: 45px;
             border-radius: 5px;
-            width: 25%;
+            width: 25%; /* 버튼 너비 */
             box-sizing: border-box;
             transition: background 0.3s;
             font-size: 0.9rem;
-            font-weight: 500;
         }
 
         .file-box label:hover {
-            background-color: #073D95;
+            background-color: #073D95; /* 호버 시 파란색 */
         }
 
         .file-box input[type="file"] {
@@ -170,8 +148,8 @@
             overflow: hidden;
             border: 0;
         }
+        /* [변경] 파일 업로드 커스텀 스타일 끝 */
 
-        /* 업로드 버튼 */
         button[type="submit"] {
             width: 100%;
             padding: 14px 0;
@@ -191,7 +169,6 @@
             transform: translateY(-2px);
         }
 
-        /* 푸터 */
         footer {
             margin-top: 20px;
             font-size: 0.9rem;
@@ -199,16 +176,11 @@
             text-align: center;
         }
 
-        /* 반응형 디자인 */
         @media (max-width: 768px) {
-            .logo {
-                position: static;
-                margin-bottom: 10px;
-                text-align: center;
-            }
+            .logo { position: static; margin-bottom: 10px; text-align: center; }
             .logo img { width: 150px; }
             h1 { font-size: 2rem; margin-top: 10px; }
-            form, .instruction { padding: 20px; }
+            form { padding: 20px; }
         }
     </style>
 </head>
@@ -217,55 +189,95 @@
         <img src="../static/logo.png" alt="Logo">
     </header>
 
-    <h1>교육 담당자 서포터</h1>
-    
+    <h1>관내여비 계산기</h1>
+
     <div class="instruction">
-        <h2>CSV 파일 업로드 방법</h2>
-        <p>엑셀 파일의 "Raw Data" 시트를 CSV 파일로 변환 후 업로드해 주세요.</p>
+        <h2>엑셀 파일 업로드 방법</h2>
+        <p>
+            출장 신청과 출입 태그 기록을 업로드해주세요.<br>
+            아래 경로에서 각각의 엑셀 파일을 다운로드할 수 있습니다.<br>
+            <span class="important-text">⚠️ 파일 내 사원코드가 반드시 포함되어 있어야 합니다.</span>
+        </p>
         <ol>
-            <li>엑셀 파일을 열고 Raw Data 시트를 선택합니다.</li>
-            <li>'파일' 메뉴에서 '다른 이름으로 저장'을 선택합니다.</li>
-            <li>'CSV(쉼표로 구분)' 형식을 선택하고 파일을 저장합니다.</li>
-            <li>이곳에서 변환한 CSV 파일을 선택하여 업로드합니다.</li>
+            <li>출장 신청 : 인사관리 > 근태관리 > 근태신청관리 > 출장신청현황</li>
+            <li>출입 태그 : 인사관리 > 근태관리 > 근무시간관리 > 출퇴근태깅이력</li>
         </ol>
+        
+        <div style="
+            background-color:#edf7ed;
+            border:1px solid #a8d5b9;
+            border-radius:8px;
+            padding:15px;
+            margin-top:20px;
+            box-shadow:0 2px 6px rgba(0, 100, 0, 0.05);">
+            <h3 style="color:#2e7d32; margin-top:0;">📢 업데이트 알림</h3>
+            <ul style="margin: 15px 0 0 10px; padding: 0; list-style: none; text-align: left; font-size: 0.95rem; color: #444; line-height: 1.8;">
+                <li style="margin-bottom: 5px;">
+                    <span style="font-weight: bold; color: #073D95;">✅ 가독성 개선 :</span> 
+                    출입 태그(인정) 기록이 없는 빈 칸은 <span style="background-color: #e0e0e0; padding: 0 5px; border-radius: 3px; font-size: 0.9em;">회색</span>으로 표시됩니다.
+                </li>
+
+                                <li style="margin-bottom: 5px;">
+                    <span style="font-weight: bold; color: #073D95;">🔧 편의성 개선 :</span> 
+                    출장 취소 기록은 <span style="background-color: #ffffff; color :#ff0000 ; padding: 0 5px; border-radius: 3px; font-size: 0.9em;">빨간색</span>으로 표시됩니다.
+                </li>
+
+                <li>
+                    <span style="font-weight: bold; color: #073D95;">💡 제보 환영 :</span> 
+                    업무 편의를 위한 사소한 아이디어도 적극 환영합니다. (담당: 최은주 주임)
+                </li>
+            </ul>
+            <p style="font-size:0.85rem; color:#4f6f52; margin-top:10px">
+                ※ 업데이트 일자 : 2026. 1. 29.
+            </p>
+         </div>
     </div>
 
-    <form action="/edu/upload" method="post" enctype="multipart/form-data">
-        <h3>CSV 파일 업로드</h3>
+    <form action="/trip/upload" method="post" enctype="multipart/form-data">
+        <h2>파일 업로드</h2>
         
-        <label class="checkbox-label">
-            <input type="checkbox" name="include_date" value="yes">
-            <span>교육일시를 포함하여 중복된 데이터 확인</span>
-        </label>
-        
+        <p>출장 신청 파일</p>
         <div class="file-box">
-            <input class="upload-name" value="파일을 선택해주세요" placeholder="파일을 선택해주세요" readonly>
-            <label for="file">파일 찾기</label> 
-            <input type="file" id="file" name="file" required accept=".csv">
+            <input class="upload-name" value="첨부된 파일 없음" placeholder="첨부된 파일 없음" readonly>
+            <label for="trip_file">파일 찾기</label> 
+            <input type="file" id="trip_file" name="trip_file" required>
         </div>
-
+        
+        <p>출입 태그 파일</p>
+        <div class="file-box">
+            <input class="upload-name" value="첨부된 파일 없음" placeholder="첨부된 파일 없음" readonly>
+            <label for="tag_file">파일 찾기</label> 
+            <input type="file" id="tag_file" name="tag_file" required>
+        </div>
+        
         <button type="submit">업로드</button>
     </form>
 
     <footer>
-        <p>&copy; 2024 ejchoe24. All rights reserved. | Version 3.1</p>
+        <p>&copy; 2024 ejchoe24. All rights reserved. | Version 4.0</p>
     </footer>
 
     <script>
-        const fileInput = document.getElementById('file');
-        
-        if(fileInput) {
-            fileInput.addEventListener('change', function(){
+        // 모든 파일 입력 요소(.file-box input[type="file"])를 찾습니다.
+        const fileInputs = document.querySelectorAll('.file-box input[type="file"]');
+
+        fileInputs.forEach(input => {
+            // 값이 변경(파일 선택)되었을 때 실행
+            input.addEventListener('change', function(){
                 let fileName;
                 if(this.files[0]) {
+                    // 파일이 선택되었다면 파일 이름을 가져옴
                     fileName = this.files[0].name;
                 } else {
-                    fileName = "파일을 선택해주세요";
+                    // 선택 취소 시
+                    fileName = "첨부된 파일 없음";
                 }
-                // 바로 위의 input 요소(파일명 표시용)에 값 넣기
+                
+                // 형제 요소 중 .upload-name(텍스트 박스)을 찾아 값을 변경
+                // (HTML 구조상 input 바로 위에 label, 그 위에 upload-name이 있으므로 parentNode 사용)
                 this.parentNode.querySelector('.upload-name').value = fileName;
             });
-        }
+        });
     </script>
 </body>
 </html>

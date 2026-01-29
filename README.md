@@ -1,2 +1,0 @@
-# bepa-supporter
-bepa-supporter

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 담당자 서포터</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0 40px; /* 좌우 여백을 늘림 */
+            background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
+            color: #333;
+            max-width: 1200px; /* 전체 페이지 최대 너비 설정 */
+            margin: 0 auto; /* 페이지 가운데 정렬 */
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logo img {
+            width: 200px;
+            height: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #073D95;
+            margin-top: 100px;
+            font-size: 2.5em;
+            animation: shine 1.5s infinite;
+        }
+        @keyframes shine {
+            0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+            100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+        }
+
+        h2 {
+            margin: 30px 0 10px; /* 위쪽 여백 조정 */
+            color: #333;
+            text-align: justify; /* 양쪽 정렬 */
+            font-size: 1.6em;
+        }
+        .divider {
+            height: 1px; /* 선의 두께 조정 */
+            background-color: #b6b6b6; /* 연한 색상 */
+            margin: 30px 0; /* 위아래 여백 조정 */
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 0; /* 여백 제거 */
+            max-width: 100%; /* 최대 너비 100%로 설정 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: #fff;
+            padding: 20px; /* 내부 여백 추가 */
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        td.highlight {
+            background-color: #ffdddd;
+        }
+        a {
+            display: inline-block;
+            margin: 10px 0; /* 위아래 여백을 table-container와 일치시키기 */
+            padding: 6px 12px; /* 버튼 크기 조정 */
+            color: #fff;
+            background-color: #073D95;
+            text-decoration: none;
+            border-radius: 8px; /* 약간 곡선이 있는 네모 */
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        a:hover {
+            background-color: #004494;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="../static/logo.png" alt="Logo">
+        </div>
+    </header>
+    
+    <h1>교육 담당자 서포터</h1>
+
+    <h2>중복 데이터 확인</h2>
+    <a href="/edu/download/{{ duplicated_file }}">다운로드</a>
+    <div class="table-container">
+        {{ duplicated_names|safe }}
+    </div>
+    <div class="divider"></div> <!-- 연한 직선 추가 -->
+
+    <h2>이름 개수가 일치하지 않는 교육 확인</h2>
+    <a href="/edu/download/{{ mismatch_file }}">다운로드</a>
+    <div class="table-container">
+        {{ name_mismatch|safe }}
+    </div>
+    <div class="divider"></div> <!-- 연한 직선 추가 -->
+
+    <h2>과정명 띄어쓰기 제거 후 비교</h2>
+    <a href="/edu/download/{{ space_comparison_file }}">다운로드</a>
+    <div class="table-container">
+        {{ space_comparison|safe }}
+    </div>
+    <div class="divider"></div> <!-- 연한 직선 추가 -->
+
+    <h2>(n차시) & (n시간) 제거 후 비교</h2>
+    <a href="/edu/download/{{ bracket_comparison_file }}">다운로드</a>
+    <div class="table-container">
+        {{ bracket_comparison|safe }}
+    </div>
+
+    <footer>
+        &copy; 2024 ejchoe24. All rights reserved. | Version 2.5
+    </footer>
+</body>
+</html>
