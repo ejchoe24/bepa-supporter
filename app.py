@@ -274,7 +274,7 @@ def upload_and_process_hr_files():
             df[['(급여)이체은행', '(급여)계좌번호']] = df['계좌번호'].apply(lambda x : pd.Series(str(x).split('/', 1)) if pd.notna(x) else pd.Series([None, None]))
         
         # 코드 매핑
-        mapping_cols = {'소속(팀)': '부서', '(급여)이체은행': '은행', '고용구분': '고용', '직급': '직급', '직책': '직책'}
+        mapping_cols = {'팀명': '부서', '(급여)이체은행': '은행', '고용구분': '고용', '직급': '직급', '직책': '직책'}
         for col, code_key in mapping_cols.items():
             if col in df.columns and code_key in codes:
                 df[col] = df[col].map(codes[code_key])
@@ -296,7 +296,7 @@ def upload_and_process_hr_files():
         df_act['메일'] = 'Y'
         df_act['최초 입사일'] = df['입사일']
         df_act['회사코드'] = '1000'
-        df_act['부서코드'] = df['소속(팀)']
+        df_act['부서코드'] = df['팀명']
         df_act['사번'] = df['사번']
         df_act['직급코드'] = df['직급']
         df_act['직책코드'] = df['직책']
