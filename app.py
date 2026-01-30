@@ -313,14 +313,6 @@ def download_hr_file(file_name):
 TEMPLATE_FOLDER = 'templates/forms'
 os.makedirs(TEMPLATE_FOLDER, exist_ok=True)
 
-@app.route('hr/templates/<filename>')
-def download_template(filename):
-    file_path = os.path.join(TEMPLATE_FOLDER, filename)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
-    else:
-        return f'파일 {filename}을 찾을 수 없습니다.', 404
-
 """
 =============== 숫자 한글 변환기 ===============
 """
