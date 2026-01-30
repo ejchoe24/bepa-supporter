@@ -230,21 +230,21 @@ def upload_and_process_hr_files():
     files = request.files
     f_form = files.get('file_form')    # 1_구글폼 작성 정보.csv
     f_insa = files.get('file_insa')    # 2_기획팀 작성 정보.csv
-    f_code = files.get('file_code')    # 0_코드.xlsx
     f_old = files.get('file_old_form') # 0_사원정보 업데이트 양식.xlsx
     
-    if not (f_form and f_insa and f_code):
+    if not (f_form and f_insa):
         return "필수 파일이 누락되었습니다."
 
     # 경로 저장
     form_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_form.csv')
     insa_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_insa.csv')
-    code_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_code.xlsx')
+    code_path = os.path.join(app.root_path, 'static', 'forms', 'codes.xlsx')
+    input_a10_path = os.path.join(app.root_path, 'static', 'forms', 'input_a10.csv')
+    input_vpn_path = os.path.join(app.root_path, 'static', 'forms', 'input_vpn.csv')
     old_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_old.xlsx')
     
     f_form.save(form_path)
     f_insa.save(insa_path)
-    f_code.save(code_path)
     if f_old: f_old.save(old_path)
 
     try:
@@ -253,9 +253,15 @@ def upload_and_process_hr_files():
         df_form = df_form.drop(['타임스탬프', '전화번호', 'VPN 계정', '복지카드', '증명사진', '통장사본', '한자 이름'], axis=1, errors='ignore')
         
         df_insa = pd.read_csv(insa_path, dtype='str')
-        
-        excel_data = pd.read_excel(code_path, sheet_name=None, dtype='string')
-        codes = {sheet_name: dict(zip(df['항목명'], df['코드'])) for sheet_name, df in excel_data.items()}
+
+        if os.path.exists(code_path):
+            excel_data = pd.read_excel(code_path, sheet_name=None, dtype='string')
+            codes = {
+                sheet_name: dict(zip(df['항목명'], df['코드']))
+                for sheet_name, df in excel_data.items()
+            }
+        else:
+            return "서버에 코드표 파일이 존재하지 않습니다.", 404
 
         # 데이터 결합
         df = pd.merge(df_form, df_insa, how='outer', on='이름')
@@ -274,31 +280,49 @@ def upload_and_process_hr_files():
                 df[col] = df[col].map(codes[code_key])
 
         # 3. 파일 생성 1: 상용직 관리 등록
-        # (양식이 필요하므로 실제 구현 시에는 0_상용직관리 등록 정보.csv의 컬럼 구조가 필요함)
-        df_act = pd.DataFrame(index=df.index)
-        df_act['로그인ID'] = df.get('계정')
-        df_act['메일ID'] = df.get('계정')
-        df_act['로그인 비밀번호'] = '111111'
-        df_act['이름(한국어)'] = df['이름']
-        df_act['성별'] = df['성별']
-        df_act['휴대전화'] = df.get('전화번호_y') # merge 후 컬럼명 확인 필요
-        df_act['기본주소'] = df.get('기본주소')
-        df_act['최초 입사일'] = df.get('입사일')
-        df_act['부서코드'] = df.get('소속(팀)')
-        df_act['사번'] = df.get('사번')
-        df_act.to_excel(os.path.join(app.config['PROCESSED_FOLDER'], 'result_상용직_등록.xlsx'), index=False)
+        df_act = pd.read_csv(input_a10_path, dtype='str')
+        df_act = pd.DataFrame(index=df.index, columns=df_act.columns)
 
-        # 4. 파일 생성 2: VPN 등록 (텍스트 파일)
-        df_vpn = pd.DataFrame()
+        df_act['로그인ID'] = df['계정']
+        df_act['메일ID'] = df['계정']
+        df_act['로그인 비밀번호'] = '111111'
+        df_act['프로필명(한국어)'] = df['이름']
+        df_act['사원명(한국어)'] = df['이름']
+        df_act['성별'] = df['성별']
+        df_act['휴대전화'] = df['전화번호']
+        df_act['기본주소'] = df['기본주소']
+        df_act['사용언어'] = '한국어'
+        df_act['기본라이선스'] = 'EBP라이선스'
+        df_act['메일'] = 'Y'
+        df_act['최초 입사일'] = df['입사일']
+        df_act['회사코드'] = '1000'
+        df_act['부서코드'] = df['부서코드']
+        df_act['사번'] = df['사번']
+        df_act['직급코드'] = df['직급']
+        df_act['직책코드'] = df['직책']
+        df_act['재직구분코드'] = 'J01'
+        df_act['고용구분코드'] = df['고용구분']
+        df_act['직무코드'] = '001'
+        df_act['입사일'] = df['입사일']
+        df_act['근태사용'] = '사용'
+        df_act['조직도'] = '표시'
+        df_act['대화/쪽지 조직도'] = '표시'
+        df_act.to_excel(os.path.join(app.config['PROCESSED_FOLDER'], 'A10 상용직관리 업로드.xlsx'), index=False)
+
+        # 4. 파일 생성 2: VPN 등록
+        df_vpn = pd.read_csv(input_vpn_path)
+        df_vpn = pd.DataFrame(index=df.index, columns=df_vpn.columns)
+
         df_vpn['U_EMAIL'] = df['계정']
         df_vpn['U_NAME'] = df['이름']
         df_vpn['U_JUMINNO'] = 'qwer1234!!'
-        df_vpn['U_CN'] = df['소속(팀)']
+        df_vpn['U_CN'] = df['팀명']
         df_vpn['U_GROUP'] = 'Default'
-        vpn_path = os.path.join(app.config['PROCESSED_FOLDER'], 'result_VPN_등록.txt')
+
+        vpn_path = os.path.join(app.config['PROCESSED_FOLDER'], 'VPN 업로드.txt')
         df_vpn.to_csv(vpn_path, index=False, sep=',', encoding='cp949')
 
-        result_files = ['result_상용직_등록.xlsx', 'result_VPN_등록.txt']
+        result_files = ['A10 상용직관리 업로드.xlsx', 'VPN 업로드.txt']
         return render_template('hr_result.html', result_files=result_files)
 
     except Exception as e:
