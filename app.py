@@ -1,15 +1,14 @@
 from flask import Flask, render_template, request, send_file # type: ignore
-import pandas as pd # type: ignore
+import pandas as pd
 import os
 import re
 import numpy as np
 import warnings
-import openpyxl # type: ignore
+import openpyxl
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
-# 업로드 및 처리 폴더 설정
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -246,7 +245,10 @@ def upload_and_process_hr_files():
     
     f_form.save(form_path)
     f_insa.save(insa_path)
-    if f_old: f_old.save(old_path)
+    old_path = None
+    if f_old and f_old.filename != '':
+        old_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_old.xlsx')
+        f_old.save(old_path)
 
     try:
         # 2. 데이터 로드 및 전처리
@@ -357,6 +359,64 @@ def upload_and_process_hr_files():
             wb.save(output_path)
         else:
             df_act.to_excel(output_path)
+
+
+# --- [수정] 4. 사원정보 업데이트 파일 생성 로직 (양식 유지) ---
+        if old_path and os.path.exists(old_path):
+            # 1) 데이터 처리를 위해 판다스로 읽기 (로직은 기존과 동일)
+            df_old = pd.read_excel(old_path, header=6, dtype=str)
+            
+            df_update = df.copy()
+            df_update['로그인ID'] = df_update.get('계정')
+            df_update['예금주'] = df_update.get('이름') 
+            
+            df_new = pd.merge(df_old, df_update, how='left', on='사번', suffixes=('', '_new'))
+
+            for col in df_update.columns:
+                if col != '사번' and col in df_old.columns:
+                    if f'{col}_new' in df_new.columns:
+                        df_new[col] = df_new[col].combine_first(df_new[f'{col}_new'])
+
+            df_new = df_new.drop(columns=[col for col in df_new.columns if col.endswith('_new')])
+            df_new = df_new.iloc[:, :21] # 21개 컬럼까지만 사용
+
+            # 추가 가공 로직
+            if '주민등록번호' in df_new.columns:
+                df_new['생년월일'] = df_new['주민등록번호'].apply(extract_birthdate)
+            if '(급여)이체은행' in df_new.columns:
+                df_new['(기타)이체은행'] = df_new['(급여)이체은행']
+            if '(급여)계좌번호' in df_new.columns:
+                df_new['(기타)계좌번호'] = df_new['(급여)계좌번호']
+            if '예금주' in df_new.columns:
+                df_new['예금주2'] = df_new['예금주']
+            if '로그인ID' in df_new.columns:
+                df_new['급여이메일'] = df_new['로그인ID'].apply(lambda x: str(x) + '@bepa.kr' if pd.notna(x) else '')
+            df_new['직종'] = '001'
+            df_new['급여형태'] = '002'
+
+            # 2) [핵심] 엑셀 양식 유지하며 저장하기 (openpyxl 사용)
+            update_filename = '사원정보 업데이트 파일.xlsx'
+            output_update_path = os.path.join(app.config['PROCESSED_FOLDER'], update_filename)
+
+            # 원본 양식 파일을 복사해서 엽니다
+            wb = openpyxl.load_workbook(old_path)
+            ws = wb.active
+
+            # 기존 데이터(8행부터)가 있다면 지우고 시작 (헤더인 7행까지는 유지)
+            if ws.max_row >= 8:
+                ws.delete_rows(8, ws.max_row)
+
+            # 데이터프레임(df_new)의 내용을 8행부터 한 줄씩 입력
+            # df_new의 컬럼 순서가 양식의 컬럼 순서와 일치한다고 가정합니다.
+            start_row = 8
+            # dataframe_to_rows 대신 직접 순회하며 값 입력 (서식 유지에 유리)
+            for i, row in df_new.iterrows():
+                for j, val in enumerate(row):
+                    # 엑셀은 1부터 시작하므로 column은 j+1
+                    ws.cell(row=start_row + i, column=j + 1).value = val
+
+            wb.save(output_update_path)
+            result_files.append(update_filename)
 
         # 4. 파일 생성 2: VPN 등록
         df_vpn = pd.read_csv(input_vpn_path)
