@@ -196,6 +196,130 @@ def download_trip_file(file_name):
         return send_file(file_path, as_attachment=True)
     else:
         return f'파일 {file_name}을 찾을 수 없습니다.'
+    
+
+"""
+=============== 신규직원 계정 생성 ===============
+"""
+def extract_birthdate(jumin):
+    if pd.isnull(jumin):
+        return None
+    jumin = str(jumin).strip().replace('-', '').replace('.', '').split('e')[0]
+    if len(jumin) < 7:
+        return None
+    
+    front = jumin[:6]
+    gender_code = jumin[6]
+
+    if gender_code in ['1', '2', '5', '6']:
+        century = '19'
+    elif gender_code in ['3', '4', '7', '8'] :
+        century = '20'
+    else:
+        return None
+
+    return century + front
+
+@app.route('/hr')
+def account_index():
+    return render_template('hr_index.html')
+
+@app.route('/hr/upload', methods=['POST'])
+def upload_and_process_hr_files():
+    # 1. 파일 받기
+    files = request.files
+    f_form = files.get('file_form')    # 1_구글폼 작성 정보.csv
+    f_insa = files.get('file_insa')    # 2_기획팀 작성 정보.csv
+    f_code = files.get('file_code')    # 0_코드.xlsx
+    f_old = files.get('file_old_form') # 0_사원정보 업데이트 양식.xlsx
+    
+    if not (f_form and f_insa and f_code):
+        return "필수 파일이 누락되었습니다."
+
+    # 경로 저장
+    form_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_form.csv')
+    insa_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_insa.csv')
+    code_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_code.xlsx')
+    old_path = os.path.join(app.config['UPLOAD_FOLDER'], 'hr_old.xlsx')
+    
+    f_form.save(form_path)
+    f_insa.save(insa_path)
+    f_code.save(code_path)
+    if f_old: f_old.save(old_path)
+
+    try:
+        # 2. 데이터 로드 및 전처리
+        df_form = pd.read_csv(form_path, dtype='str')
+        df_form = df_form.drop(['타임스탬프', '전화번호', 'VPN 계정', '복지카드', '증명사진', '통장사본', '한자 이름'], axis=1, errors='ignore')
+        
+        df_insa = pd.read_csv(insa_path, dtype='str')
+        
+        excel_data = pd.read_excel(code_path, sheet_name=None, dtype='string')
+        codes = {sheet_name: dict(zip(df['항목명'], df['코드'])) for sheet_name, df in excel_data.items()}
+
+        # 데이터 결합
+        df = pd.merge(df_form, df_insa, how='outer', on='이름')
+
+        # 데이터 수정 로직
+        df['성별'] = df['성별'].apply(lambda x : '여성' if x=='여' else '남성')
+        df['주민등록번호'] = df['주민등록번호'].str.replace('-','')
+        if '계좌번호' in df.columns:
+            df['계좌번호'] = df['계좌번호'].str.replace(' ', '')
+            df[['(급여)이체은행', '(급여)계좌번호']] = df['계좌번호'].apply(lambda x : pd.Series(str(x).split('/', 1)) if pd.notna(x) else pd.Series([None, None]))
+        
+        # 코드 매핑
+        mapping_cols = {'소속(팀)': '부서', '(급여)이체은행': '은행', '고용구분': '고용', '직급': '직급', '직책': '직책'}
+        for col, code_key in mapping_cols.items():
+            if col in df.columns and code_key in codes:
+                df[col] = df[col].map(codes[code_key])
+
+        # 3. 파일 생성 1: 상용직 관리 등록
+        # (양식이 필요하므로 실제 구현 시에는 0_상용직관리 등록 정보.csv의 컬럼 구조가 필요함)
+        df_act = pd.DataFrame(index=df.index)
+        df_act['로그인ID'] = df.get('계정')
+        df_act['메일ID'] = df.get('계정')
+        df_act['로그인 비밀번호'] = '111111'
+        df_act['이름(한국어)'] = df['이름']
+        df_act['성별'] = df['성별']
+        df_act['휴대전화'] = df.get('전화번호_y') # merge 후 컬럼명 확인 필요
+        df_act['기본주소'] = df.get('기본주소')
+        df_act['최초 입사일'] = df.get('입사일')
+        df_act['부서코드'] = df.get('소속(팀)')
+        df_act['사번'] = df.get('사번')
+        df_act.to_excel(os.path.join(app.config['PROCESSED_FOLDER'], 'result_상용직_등록.xlsx'), index=False)
+
+        # 4. 파일 생성 2: VPN 등록 (텍스트 파일)
+        df_vpn = pd.DataFrame()
+        df_vpn['U_EMAIL'] = df['계정']
+        df_vpn['U_NAME'] = df['이름']
+        df_vpn['U_JUMINNO'] = 'qwer1234!!'
+        df_vpn['U_CN'] = df['소속(팀)']
+        df_vpn['U_GROUP'] = 'Default'
+        vpn_path = os.path.join(app.config['PROCESSED_FOLDER'], 'result_VPN_등록.txt')
+        df_vpn.to_csv(vpn_path, index=False, sep=',', encoding='cp949')
+
+        result_files = ['result_상용직_등록.xlsx', 'result_VPN_등록.txt']
+        return render_template('hr_result.html', result_files=result_files)
+
+    except Exception as e:
+        return f"인사 정보 처리 중 오류 발생: {str(e)}"
+
+# 다운로드 경로는 기존 trip 다운로드와 유사하게 구성 가능
+@app.route('/hr/download/<file_name>')
+def download_hr_file(file_name):
+    file_path = os.path.join(app.config['PROCESSED_FOLDER'], file_name)
+    return send_file(file_path, as_attachment=True)
+
+TEMPLATE_FOLDER = 'templates/forms'
+os.makedirs(TEMPLATE_FOLDER, exist_ok=True)
+
+@app.route('hr/templates/<filename>')
+def download_template(filename):
+    file_path = os.path.join(TEMPLATE_FOLDER, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        return f'파일 {filename}을 찾을 수 없습니다.', 404
 
 """
 =============== 숫자 한글 변환기 ===============

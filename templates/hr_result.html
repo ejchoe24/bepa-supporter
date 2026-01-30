@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인사 정보 처리 결과</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 기본 스타일 및 디자인 유지 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f9f9f9, #e0e0e0);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .logo { position: absolute; top: 20px; right: 20px; }
+        .logo img { width: 180px; height: auto; }
+
+        h1 {
+            text-align: center;
+            color: #073D95;
+            margin-top: 60px;
+            margin-bottom: 40px;
+            font-size: 2.3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            word-break: keep-all;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin: 0 0 20px;
+            color: #073D95;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .info-msg {
+            background-color: #f0f7ff;
+            border-left: 4px solid #073D95;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #eee;
+            padding: 15px 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 700;
+            color: #555;
+            border-top: 2px solid #073D95;
+        }
+
+        tr:hover td { background-color: #f1f8ff; }
+
+        td:first-child {
+            text-align: left;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            color: #fff;
+            background-color: #073D95;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .action-area {
+            margin-top: 35px;
+            text-align: center;
+        }
+
+        .home-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #fff;
+            color: #073D95;
+            border: 2px solid #073D95;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: #073D95;
+            color: #fff;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 30px 0;
+            font-size: 0.85rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header class="logo">
+        <img src="../static/logo.png" alt="Logo">
+    </header>
+
+    <h1>인사 정보 통합 관리 결과</h1>
+
+    <div class="container">
+        <h2>✅ 프로세싱 완료</h2>
+        <div class="info-msg">
+            신규 입사자 정보 매핑이 정상적으로 완료되었습니다.<br>
+            아래 파일들을 다운로드하여 각 시스템에 업로드하세요.
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>파일명</th>
+                    <th style="width: 120px;">다운로드</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file_name in result_files %}
+                <tr>
+                    <td>
+                        {% if 'xlsx' in file_name %}📊{% else %}📝{% endif %} 
+                        {{ file_name }}
+                    </td>
+                    <td>
+                        <a class="download-btn" href="{{ url_for('download_hr_file', file_name=file_name) }}">
+                            저장
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="action-area">
+            <a href="/hr" class="home-btn">이전으로 돌아가기</a>
+            <a href="/" class="home-btn" style="margin-left: 10px;">메인 화면</a>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 코딩 파트너 서포트 | Version 1.0
+    </footer>
+</body>
+</html>
