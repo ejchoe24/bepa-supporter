@@ -4,6 +4,7 @@ import os
 import re
 import numpy as np
 import warnings
+import openpyxl # type: ignore
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -307,7 +308,55 @@ def upload_and_process_hr_files():
         df_act['근태사용'] = '사용'
         df_act['조직도'] = '표시'
         df_act['대화/쪽지 조직도'] = '표시'
-        df_act.to_excel(os.path.join(app.config['PROCESSED_FOLDER'], 'A10 상용직관리 업로드.xlsx'), index=False)
+
+        template_path = os.path.join(app.root_path, 'static', 'forms', 'template_a10.xlsx')
+        output_path = os.path.join(app.config['PROCESSED_FOLDER'], 'A10 상용직관리 업로드.xlsx')
+
+        if os.path.exists(template_path):
+            wb = openpyxl.load_workbook(template_path)
+            ws = wb.active # 첫 번째 시트 선택
+
+            # 기존 샘플 데이터(8행부터) 삭제
+            if ws.max_row >= 8:
+                ws.delete_rows(8, ws.max_row) 
+
+            # 데이터 입력 (8행부터 시작)
+            start_row = 8
+            for i, row in df_act.iterrows():
+                current_row = start_row + i
+                
+                # 순번 (A열)
+                ws.cell(row=current_row, column=1).value = i + 1
+                
+                # 데이터 매핑 (엑셀 컬럼 위치에 맞춰 값 입력)
+                ws.cell(row=current_row, column=2).value = row['로그인ID']       # B열
+                ws.cell(row=current_row, column=3).value = row['메일ID']         # C열
+                ws.cell(row=current_row, column=4).value = row['로그인 비밀번호'] # D열
+                ws.cell(row=current_row, column=5).value = row['프로필명(한국어)'] # E열
+                ws.cell(row=current_row, column=9).value = row['사원명(한국어)']   # I열
+                ws.cell(row=current_row, column=13).value = row['성별']           # M열
+                ws.cell(row=current_row, column=14).value = row['휴대전화']       # N열
+                ws.cell(row=current_row, column=19).value = row['기본주소']       # S열
+                ws.cell(row=current_row, column=21).value = row['사용언어']       # U열
+                ws.cell(row=current_row, column=23).value = row['기본라이선스']    # W열
+                ws.cell(row=current_row, column=24).value = row['메일']           # X열
+                ws.cell(row=current_row, column=26).value = row['최초 입사일']     # Z열
+                ws.cell(row=current_row, column=28).value = row['회사코드']       # AB열
+                ws.cell(row=current_row, column=29).value = row['부서코드']       # AC열
+                ws.cell(row=current_row, column=30).value = row['사번']           # AD열
+                ws.cell(row=current_row, column=31).value = row['직급코드']       # AE열
+                ws.cell(row=current_row, column=32).value = row['직책코드']       # AF열
+                ws.cell(row=current_row, column=33).value = row['재직구분코드']    # AG열
+                ws.cell(row=current_row, column=34).value = row['고용구분코드']    # AH열
+                ws.cell(row=current_row, column=35).value = row['직무코드']       # AI열
+                ws.cell(row=current_row, column=41).value = row['입사일']         # AO열
+                ws.cell(row=current_row, column=43).value = row['근태사용']       # AQ열
+                ws.cell(row=current_row, column=50).value = row['조직도']         # AX열
+                ws.cell(row=current_row, column=51).value = row['대화/쪽지 조직도'] # AY열
+
+            wb.save(output_path)
+        else:
+            df_act.to_excel(output_path)
 
         # 4. 파일 생성 2: VPN 등록
         df_vpn = pd.read_csv(input_vpn_path)
