@@ -338,21 +338,21 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=14).value = row['휴대전화']       # N열
                 ws.cell(row=current_row, column=19).value = row['기본주소']       # S열
                 ws.cell(row=current_row, column=21).value = row['사용언어']       # U열
-                ws.cell(row=current_row, column=23).value = row['기본라이선스']    # W열
-                ws.cell(row=current_row, column=24).value = row['메일']           # X열
-                ws.cell(row=current_row, column=26).value = row['최초 입사일']     # Z열
-                ws.cell(row=current_row, column=28).value = row['회사코드']       # AB열
-                ws.cell(row=current_row, column=29).value = row['부서코드']       # AC열
-                ws.cell(row=current_row, column=30).value = row['사번']           # AD열
-                ws.cell(row=current_row, column=31).value = row['직급코드']       # AE열
-                ws.cell(row=current_row, column=32).value = row['직책코드']       # AF열
-                ws.cell(row=current_row, column=33).value = row['재직구분코드']    # AG열
-                ws.cell(row=current_row, column=34).value = row['고용구분코드']    # AH열
-                ws.cell(row=current_row, column=35).value = row['직무코드']       # AI열
-                ws.cell(row=current_row, column=41).value = row['입사일']         # AO열
-                ws.cell(row=current_row, column=43).value = row['근태사용']       # AQ열
-                ws.cell(row=current_row, column=50).value = row['조직도']         # AX열
-                ws.cell(row=current_row, column=51).value = row['대화/쪽지 조직도'] # AY열
+                ws.cell(row=current_row, column=26).value = row['기본라이선스']    # W열
+                ws.cell(row=current_row, column=27).value = row['메일']           # X열
+                ws.cell(row=current_row, column=28).value = row['최초 입사일']     # Z열
+                ws.cell(row=current_row, column=30).value = row['회사코드']       # AB열
+                ws.cell(row=current_row, column=31).value = row['부서코드']       # AC열
+                ws.cell(row=current_row, column=32).value = row['사번']           # AD열
+                ws.cell(row=current_row, column=33).value = row['직급코드']       # AE열
+                ws.cell(row=current_row, column=34).value = row['직책코드']       # AF열
+                ws.cell(row=current_row, column=35).value = row['재직구분코드']    # AG열
+                ws.cell(row=current_row, column=36).value = row['고용구분코드']    # AH열
+                ws.cell(row=current_row, column=37).value = row['직무코드']       # AI열
+                ws.cell(row=current_row, column=42).value = row['입사일']         # AO열
+                ws.cell(row=current_row, column=44).value = row['근태사용']       # AQ열
+                ws.cell(row=current_row, column=51).value = row['조직도']         # AX열
+                ws.cell(row=current_row, column=52).value = row['대화/쪽지 조직도'] # AY열
 
             wb.save(output_path)
         else:
