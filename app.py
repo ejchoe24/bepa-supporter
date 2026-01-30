@@ -296,7 +296,7 @@ def upload_and_process_hr_files():
         df_act['메일'] = 'Y'
         df_act['최초 입사일'] = df['입사일']
         df_act['회사코드'] = '1000'
-        df_act['부서코드'] = df['부서코드']
+        df_act['부서코드'] = df['소속(팀)']
         df_act['사번'] = df['사번']
         df_act['직급코드'] = df['직급']
         df_act['직책코드'] = df['직책']
@@ -333,9 +333,6 @@ def upload_and_process_hr_files():
 def download_hr_file(file_name):
     file_path = os.path.join(app.config['PROCESSED_FOLDER'], file_name)
     return send_file(file_path, as_attachment=True)
-
-TEMPLATE_FOLDER = 'templates/forms'
-os.makedirs(TEMPLATE_FOLDER, exist_ok=True)
 
 """
 =============== 숫자 한글 변환기 ===============
