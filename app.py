@@ -445,7 +445,8 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=22).value = row.get('프로필명(한국어)')
 
             wb.save(output_update_path)
-            result_files.append(update_filename)
+            result_files = [update_filename]
+            return render_template('hr_result.html', result_files=result_files)
 
         # 4. 파일 생성 2: VPN 등록
         df_vpn = pd.read_csv(input_vpn_path)
