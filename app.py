@@ -364,19 +364,9 @@ def upload_and_process_hr_files():
         # 4. 사원정보 업데이트 파일 생성
         if old_path and os.path.exists(old_path):
             df_old = pd.read_excel(old_path, header=5, dtype=str)
-            # [수정 1] 헤더 공백 제거 및 컬럼 확인 로직 추가
-            df_old.columns = df_old.columns.str.strip()
             
-            # [수정 2] 사번 컬럼이 진짜 있는지 확인 (없으면 에러 메시지 반환)
-            if '사번' not in df_old.columns:
-                return f"오류: 업로드한 양식 파일의 7번째 줄(행)에 '사번' 컬럼이 없습니다. (현재 감지된 컬럼: {list(df_old.columns)})"
-            
-            df_update = df_act.copy()
-            df_update['예금주'] = df_update.get('사원명(한국어)') 
-
-            # [수정 3] df_update에도 사번이 있는지 확실히 체크 (merge 에러 방지)
-            if '사번' not in df_update.columns:
-                 df_update['사번'] = None
+            df_update = df.copy()
+            df_update['예금주'] = df_update.get('이름') 
 
             df_new = pd.merge(df_old, df_update, how='left', on='사번', suffixes=('', '_new'))
 
@@ -411,20 +401,20 @@ def upload_and_process_hr_files():
             ws = wb.active
 
             # 기존 데이터(8행부터)가 있다면 지우고 시작 (헤더인 7행까지는 유지)
-            if ws.max_row >= 8:
-                ws.delete_rows(8, ws.max_row)
+            if ws.max_row >= 7:
+                ws.delete_rows(7, ws.max_row)
 
             # 데이터프레임(df_new)의 내용을 8행부터 한 줄씩 입력
             # df_new의 컬럼 순서가 양식의 컬럼 순서와 일치한다고 가정합니다.
-            start_row = 8
+            start_row = 7
             # dataframe_to_rows 대신 직접 순회하며 값 입력 (서식 유지에 유리)
             for i, row in df_new.iterrows():
                 current_row = start_row + i
                 
                 ws.cell(row=current_row, column=1).value = i + 1
                 ws.cell(row=current_row, column=2).value = row.get('사번')
-                ws.cell(row=current_row, column=3).value = row.get('프로필명(한국어)')
-                ws.cell(row=current_row, column=4).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=3).value = row.get('이름')
+                ws.cell(row=current_row, column=4).value = row.get('이름')
                 ws.cell(row=current_row, column=5).value = row.get('로그인ID')
                 ws.cell(row=current_row, column=6).value = row.get('회사코드')
                 ws.cell(row=current_row, column=7).value = row.get('회사코드')
@@ -435,14 +425,14 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=12).value = row.get('생년월일')
                 ws.cell(row=current_row, column=13).value = '000'
                 ws.cell(row=current_row, column=14).value = row.get('급여이메일')
-                ws.cell(row=current_row, column=15).value = '002'
-                ws.cell(row=current_row, column=16).value = '001'
+                ws.cell(row=current_row, column=15).value = row.get('급여형태')
+                ws.cell(row=current_row, column=16).value = row.get('직종')
                 ws.cell(row=current_row, column=17).value = row.get('(급여)이체은행')
                 ws.cell(row=current_row, column=18).value = row.get('(급여)계좌번호')
-                ws.cell(row=current_row, column=19).value = row.get('프로필명(한국어)')
-                ws.cell(row=current_row, column=20).value = row.get('(급여)이체은행')
-                ws.cell(row=current_row, column=21).value = row.get('(급여)계좌번호')
-                ws.cell(row=current_row, column=22).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=19).value = row.get('이름')
+                ws.cell(row=current_row, column=20).value = row.get('(기타)이체은행')
+                ws.cell(row=current_row, column=21).value = row.get('(기타)계좌번호')
+                ws.cell(row=current_row, column=22).value = row.get('이름')
 
             wb.save(output_update_path)
             result_files = [update_filename]
