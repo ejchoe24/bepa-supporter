@@ -401,12 +401,12 @@ def upload_and_process_hr_files():
             ws = wb.active
 
             # 기존 데이터(8행부터)가 있다면 지우고 시작 (헤더인 7행까지는 유지)
-            if ws.max_row >= 7:
-                ws.delete_rows(7, ws.max_row)
+            if ws.max_row >= 8:
+                ws.delete_rows(8, ws.max_row)
 
             # 데이터프레임(df_new)의 내용을 8행부터 한 줄씩 입력
             # df_new의 컬럼 순서가 양식의 컬럼 순서와 일치한다고 가정합니다.
-            start_row = 7
+            start_row = 9
             # dataframe_to_rows 대신 직접 순회하며 값 입력 (서식 유지에 유리)
             for i, row in df_new.iterrows():
                 current_row = start_row + i
