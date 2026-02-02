@@ -409,9 +409,30 @@ def upload_and_process_hr_files():
             start_row = 8
             # dataframe_to_rows 대신 직접 순회하며 값 입력 (서식 유지에 유리)
             for i, row in df_new.iterrows():
-                for j, val in enumerate(row):
-                    # 엑셀은 1부터 시작하므로 column은 j+1
-                    ws.cell(row=start_row + i, column=j + 1).value = val
+                current_row = start_row + i
+                
+                ws.cell(row=current_row, column=1).value = i + 1
+                ws.cell(row=current_row, column=2).value = row.get('사번')
+                ws.cell(row=current_row, column=3).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=4).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=5).value = row.get('로그인ID')
+                ws.cell(row=current_row, column=6).value = row.get('회사코드')
+                ws.cell(row=current_row, column=7).value = row.get('회사코드')
+                ws.cell(row=current_row, column=8).value = row.get('부서코드')
+                ws.cell(row=current_row, column=9).value = '000'
+                ws.cell(row=current_row, column=10).value = row.get('주민등록번호')
+                ws.cell(row=current_row, column=11).value = None
+                ws.cell(row=current_row, column=12).value = row.get('생년월일')
+                ws.cell(row=current_row, column=13).value = '000'
+                ws.cell(row=current_row, column=14).value = row.get('급여이메일')
+                ws.cell(row=current_row, column=15).value = '002'
+                ws.cell(row=current_row, column=16).value = '001'
+                ws.cell(row=current_row, column=17).value = row.get('(급여)이체은행')
+                ws.cell(row=current_row, column=18).value = row.get('(급여)계좌번호')
+                ws.cell(row=current_row, column=19).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=20).value = row.get('(급여)이체은행')
+                ws.cell(row=current_row, column=21).value = row.get('(급여)계좌번호')
+                ws.cell(row=current_row, column=22).value = row.get('프로필명(한국어)')
 
             wb.save(output_update_path)
             result_files.append(update_filename)
