@@ -364,10 +364,20 @@ def upload_and_process_hr_files():
         # 4. 사원정보 업데이트 파일 생성
         if old_path and os.path.exists(old_path):
             df_old = pd.read_excel(old_path, header=6, dtype=str)
+            # [수정 1] 헤더 공백 제거 및 컬럼 확인 로직 추가
+            df_old.columns = df_old.columns.str.strip()
+            
+            # [수정 2] 사번 컬럼이 진짜 있는지 확인 (없으면 에러 메시지 반환)
+            if '사번' not in df_old.columns:
+                return f"오류: 업로드한 양식 파일의 7번째 줄(행)에 '사번' 컬럼이 없습니다. (현재 감지된 컬럼: {list(df_old.columns)})"
             
             df_update = df_act.copy()
             df_update['예금주'] = df_update.get('사원명(한국어)') 
-            
+
+            # [수정 3] df_update에도 사번이 있는지 확실히 체크 (merge 에러 방지)
+            if '사번' not in df_update.columns:
+                 df_update['사번'] = None
+
             df_new = pd.merge(df_old, df_update, how='left', on='사번', suffixes=('', '_new'))
 
             for col in df_update.columns:
