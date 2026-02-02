@@ -413,8 +413,8 @@ def upload_and_process_hr_files():
                 
                 ws.cell(row=current_row, column=1).value = i + 1
                 ws.cell(row=current_row, column=2).value = row.get('사번')
-                ws.cell(row=current_row, column=3).value = row.get('이름')
-                ws.cell(row=current_row, column=4).value = row.get('이름')
+                ws.cell(row=current_row, column=3).value = row.get('프로필명(한국어)')
+                ws.cell(row=current_row, column=4).value = row.get('프로필명(한국어)')
                 ws.cell(row=current_row, column=5).value = row.get('로그인ID')
                 ws.cell(row=current_row, column=6).value = row.get('회사코드')
                 ws.cell(row=current_row, column=7).value = row.get('회사코드')
@@ -429,10 +429,10 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=16).value = row.get('직종')
                 ws.cell(row=current_row, column=17).value = row.get('(급여)이체은행')
                 ws.cell(row=current_row, column=18).value = row.get('(급여)계좌번호')
-                ws.cell(row=current_row, column=19).value = row.get('이름')
+                ws.cell(row=current_row, column=19).value = row.get('프로필명(한국어)')
                 ws.cell(row=current_row, column=20).value = row.get('(기타)이체은행')
                 ws.cell(row=current_row, column=21).value = row.get('(기타)계좌번호')
-                ws.cell(row=current_row, column=22).value = row.get('이름')
+                ws.cell(row=current_row, column=22).value = row.get('프로필명(한국어)')
 
             ws.delete_rows(8, 1)
             wb.save(output_update_path)
