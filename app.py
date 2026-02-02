@@ -361,14 +361,12 @@ def upload_and_process_hr_files():
             df_act.to_excel(output_path)
 
 
-# --- [수정] 4. 사원정보 업데이트 파일 생성 로직 (양식 유지) ---
+        # 4. 사원정보 업데이트 파일 생성
         if old_path and os.path.exists(old_path):
-            # 1) 데이터 처리를 위해 판다스로 읽기 (로직은 기존과 동일)
             df_old = pd.read_excel(old_path, header=6, dtype=str)
             
-            df_update = df.copy()
-            df_update['로그인ID'] = df_update.get('계정')
-            df_update['예금주'] = df_update.get('이름') 
+            df_update = df_act.copy()
+            df_update['예금주'] = df_update.get('사원명(한국어)') 
             
             df_new = pd.merge(df_old, df_update, how='left', on='사번', suffixes=('', '_new'))
 
@@ -378,7 +376,7 @@ def upload_and_process_hr_files():
                         df_new[col] = df_new[col].combine_first(df_new[f'{col}_new'])
 
             df_new = df_new.drop(columns=[col for col in df_new.columns if col.endswith('_new')])
-            df_new = df_new.iloc[:, :21] # 21개 컬럼까지만 사용
+            df_new = df_new.iloc[:, :22] # 21개 컬럼까지만 사용
 
             # 추가 가공 로직
             if '주민등록번호' in df_new.columns:
