@@ -363,7 +363,7 @@ def upload_and_process_hr_files():
 
         # 4. 사원정보 업데이트 파일 생성
         if old_path and os.path.exists(old_path):
-            df_old = pd.read_excel(old_path, header=6, dtype=str)
+            df_old = pd.read_excel(old_path, header=5, dtype=str)
             # [수정 1] 헤더 공백 제거 및 컬럼 확인 로직 추가
             df_old.columns = df_old.columns.str.strip()
             
