@@ -434,7 +434,7 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=21).value = row.get('(기타)계좌번호')
                 ws.cell(row=current_row, column=22).value = row.get('이름')
 
-            ws.delete_rows(8, ws.max_row)
+            ws.delete_rows(8, 1)
             wb.save(output_update_path)
             result_files = [update_filename]
             return render_template('hr_result.html', result_files=result_files)
