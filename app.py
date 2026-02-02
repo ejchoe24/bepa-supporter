@@ -410,7 +410,6 @@ def upload_and_process_hr_files():
             # dataframe_to_rows 대신 직접 순회하며 값 입력 (서식 유지에 유리)
             for i, row in df_new.iterrows():
                 current_row = start_row + i
-                row += 1
                 
                 ws.cell(row=current_row, column=1).value = i + 1
                 ws.cell(row=current_row, column=2).value = row.get('사번')
@@ -435,6 +434,7 @@ def upload_and_process_hr_files():
                 ws.cell(row=current_row, column=21).value = row.get('(기타)계좌번호')
                 ws.cell(row=current_row, column=22).value = row.get('이름')
 
+            ws.delete_rows(8, ws.max_row)
             wb.save(output_update_path)
             result_files = [update_filename]
             return render_template('hr_result.html', result_files=result_files)
