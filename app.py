@@ -30,11 +30,12 @@ def trip_index():
 
 @app.route('/trip/upload', methods=['POST'])
 def upload_and_process_trip_files():
-    if 'trip_file' not in request.files or 'tag_file' not in request.files:
+    if 'trip_file' not in request.files or 'tag_file' not in request.files or 'type_file' not in request.files:
         return 'No file part'
     
     trip_file = request.files['trip_file']
     tag_file = request.files['tag_file']
+    type_file = request.files['type_file']
     
     if trip_file.filename == '' or tag_file.filename == '':
         return 'No selected file'
@@ -42,8 +43,11 @@ def upload_and_process_trip_files():
     # 경로 설정 및 저장
     trip_path = os.path.join(app.config['UPLOAD_FOLDER'], 'trip_all.xlsx')
     tag_path = os.path.join(app.config['UPLOAD_FOLDER'], 'tag_all.xlsx')
+    type_path = os.path.join(app.config['UPLOAD_FOLDER'], 'type_all.xlsx') 
+
     trip_file.save(trip_path)
     tag_file.save(tag_path)
+    type_file.save(type_path)   
     
     try:
         # 1. 데이터 로드 및 전처리
@@ -51,6 +55,10 @@ def upload_and_process_trip_files():
         col_tmp = pd.read_excel(trip_path, nrows=0).columns
         col_tmp = col_tmp[:col_tmp.get_loc('출장기간') - 1]
         df_trip.columns.values[:len(col_tmp)+1] = pd.read_excel(trip_path, nrows=0).columns[:8]
+
+        # 추가. 근무 유형 데이터 처리
+        df_type = pd.read_excel(type_path, header=0)
+        df_trip = pd.merge(df_trip, df_type[['사번', '출근시간', '퇴근시간']], how='left', left_on='사원코드', right_on='사번')
 
         # 필터링
         df_trip = df_trip[
@@ -65,7 +73,7 @@ def upload_and_process_trip_files():
 
         # 필요한 컬럼 추출
         cols_needed = ['부서', '사원코드', '사원', '직급', '신청일', '시작일', '종료일', '시작시간', '종료시간',
-                       '일수', '신청시간', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용']
+                       '일수', '신청시간', '교통수단', '운전자', '출발지', '도착지', '경유지', '방문처', '목적', '내용', '출근시간', '퇴근시간']
         df_trip = df_trip[cols_needed].copy()
         
         # 2. 태그 데이터 처리
@@ -84,6 +92,9 @@ def upload_and_process_trip_files():
             end_time = row['종료시간']
             out_time = row['외출태그']
             in_time = row['복귀태그']
+
+            custom_start_time = str(row['출근시간'])[:5] if pd.notna(row['출근시간']) else '09:00'
+            custom_end_time = str(row['퇴근시간'])[:5] if pd.notna(row['퇴근시간']) else '18:00'
             
             # 기본값: 태그가 있으면 일단 가져옴 (시간 포맷팅)
             if pd.notna(out_time): 
@@ -98,18 +109,18 @@ def upload_and_process_trip_files():
             else:
                 in_use = None
 
-            # [수정] 로직 1: 신청시간과 태그시간 불일치 -> None (빈칸) 반환
+            # 로직 1: 신청시간과 태그시간 불일치 -> None (빈칸) 반환
             if pd.notna(out_time) and pd.notna(in_time):
                 if (out_time > end_time) or (in_time < str_time):
                     return pd.Series([out_time, in_time, None, None]) 
 
             # 로직 2: 자동 설정 (없는 경우 인정)
-            if (str_time <= '09:00') and pd.isna(out_time):
+            if (str_time <= custom_start_time) and pd.isna(out_time):
                 out_use = str_time
             elif pd.notna(out_time) and (str_time > out_time):
                 out_use = str_time
             
-            if (end_time >= '18:00') and pd.isna(in_time):
+            if (end_time >= custom_end_time) and pd.isna(in_time):
                 in_use = end_time
             elif pd.notna(in_time) and (end_time < in_time):
                 in_use = end_time
@@ -120,7 +131,6 @@ def upload_and_process_trip_files():
         df_trip[['외출태그', '복귀태그', '외출태그(인정)', '복귀태그(인정)']] = df_trip.apply(apply_logic, axis=1)
         
         # 4. 시간 및 여비 계산
-        # [수정] calc_out 대신 '외출태그(인정)'을 바로 사용합니다.
         out_dt = pd.to_datetime(df_trip['외출태그(인정)'], format='%H:%M', errors='coerce')
         in_dt = pd.to_datetime(df_trip['복귀태그(인정)'], format='%H:%M', errors='coerce')
         
@@ -148,7 +158,7 @@ def upload_and_process_trip_files():
         df_trip['여비'] = df_trip['여비'].clip(lower=0) 
 
         # 불필요 컬럼 제거
-        df_trip.drop(columns=['태깅일자_x', '사원코드_x', '태깅일자_y', '사원코드_y'], inplace=True, errors='ignore')
+        df_trip.drop(columns=['태깅일자_x', '사원코드_x', '태깅일자_y', '사원코드_y', '출근시간', '퇴근시간', '사번'], inplace=True, errors='ignore')
 
     except Exception as e:
         return f"파일 처리 중 오류 발생: {str(e)}"
