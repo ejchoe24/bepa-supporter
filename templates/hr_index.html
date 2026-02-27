@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>신규직원 계정 생성</title>
+        <title>신규 직원 계정 생성</title>
         <link
             href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
             rel="stylesheet"
@@ -219,11 +219,11 @@
             ><img src="../static/logo.png" alt="Logo"
         /></header>
 
-        <h1>신규직원 계정 생성</h1>
+        <h1>신규 직원 계정 생성</h1>
 
         <div class="instruction">
             <h2>데이터 가공 안내</h2>
-            <p>신규 입사자의 구글 폼 응답 데이터와 기획팀 추가 정보를 결합합니다.</p>
+            <p>신규 입사자의 구글 폼 응답 데이터와 기초 인사 정보를 결합합니다.</p>
             <div style="margin-top: 15px; display: flex; gap: 10px">
                 <a
                     href="/static/forms/template_google_form.csv"
@@ -235,7 +235,7 @@
                     href="/static/forms/template_hr.csv"
                     download
                     style="text-decoration: none; background-color: #fff; color: #073d95; padding: 5px 12px; border: 1px solid #073d95; border-radius: 4px; font-size: 0.85rem; font-weight: bold"
-                    >📥 인사정보 양식 다운로드</a
+                    >📥 인사 정보 양식 다운로드</a
                 >
             </div>
         </div>
@@ -301,7 +301,7 @@
                 <input type="file" id="file_form" name="file_form" required />
             </div>
 
-            <p>2. 기획팀 작성 정보 (CSV)</p>
+            <p>2. 기초 인사 정보 (CSV)</p>
             <div class="file-box">
                 <input class="upload-name" value="첨부된 파일 없음" readonly />
                 <label for="file_insa">파일 찾기</label>
@@ -309,16 +309,24 @@
             </div>
 
             <p>3. 사원정보 업데이트 양식 (XLSX, 선택)</p>
+                <div class="info-card">
+                <b>💡 사원정보 업데이트 파일 다운로드 방법</b>
+                <ul>
+                    <li>시스템설정 > 사원관리 > 사원정보엑셀업로드</b></li>
+                    <li>업데이트 등록 > 펼침 > 입사일자 설정 > 파일 다운로드</li>
+                    <li>파일업로드 : 기능모음 > 파일업로드</li>
+                </ul>
+            </div>
             <div class="file-box">
                 <input class="upload-name" value="첨부된 파일 없음" readonly />
                 <label for="file_old_form">파일 찾기</label>
                 <input type="file" id="file_old_form" name="file_old_form" />
             </div>
 
-            <button type="submit">인사 정보 프로세싱 시작</button>
+            <button type="submit">파일 생성</button>
         </form>
 
-        <footer><p>&copy; 2026 코딩 파트너 서포트 | Version 1.0</p></footer>
+        <footer><p>&copy; 2024 ejchoe24. All rights reserved. | Version 4.0</p></footer>
 
         <script>
             const fileInputs = document.querySelectorAll('.file-box input[type="file"]');
