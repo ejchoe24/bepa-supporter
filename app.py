@@ -30,12 +30,12 @@ def trip_index():
 
 @app.route('/trip/upload', methods=['POST'])
 def upload_and_process_trip_files():
-    if 'trip_file' not in request.files or 'tag_file' not in request.files or 'type_file' not in request.files:
+    if 'trip_file' not in request.files or 'tag_file' not in request.files:
         return 'No file part'
     
     trip_file = request.files['trip_file']
     tag_file = request.files['tag_file']
-    type_file = request.files['type_file']
+    type_file = request.files.get('type_file')
     
     if trip_file.filename == '' or tag_file.filename == '':
         return 'No selected file'
@@ -43,11 +43,9 @@ def upload_and_process_trip_files():
     # 경로 설정 및 저장
     trip_path = os.path.join(app.config['UPLOAD_FOLDER'], 'trip_all.xlsx')
     tag_path = os.path.join(app.config['UPLOAD_FOLDER'], 'tag_all.xlsx')
-    type_path = os.path.join(app.config['UPLOAD_FOLDER'], 'type_all.xlsx') 
 
     trip_file.save(trip_path)
     tag_file.save(tag_path)
-    type_file.save(type_path)   
     
     try:
         # 1. 데이터 로드 및 전처리
@@ -56,9 +54,19 @@ def upload_and_process_trip_files():
         col_tmp = col_tmp[:col_tmp.get_loc('출장기간') - 1]
         df_trip.columns.values[:len(col_tmp)+1] = pd.read_excel(trip_path, nrows=0).columns[:8]
 
-        # 추가. 근무 유형 데이터 처리
-        df_type = pd.read_excel(type_path, header=0)
-        df_trip = pd.merge(df_trip, df_type[['사번', '출근시간', '퇴근시간']], how='left', left_on='사원코드', right_on='사번')
+        # 추가. 근무 유형 데이터 처리 (선택)
+        if type_file and type_file.filename != '':
+            type_path = os.path.join(app.config['UPLOAD_FOLDER'], 'type_all.xlsx') 
+            type_file.save(type_path)
+            
+            df_type = pd.read_excel(type_path, header=0)
+            df_trip = pd.merge(df_trip, df_type[['사번', '출근시간', '퇴근시간']], how='left', left_on='사원코드', right_on='사번')
+        else:
+            # type_file이 없을 경우, 이후 로직(apply_logic)에서 KeyError가 나지 않도록 빈 컬럼 생성
+            df_trip['출근시간'] = np.nan
+            df_trip['퇴근시간'] = np.nan
+            # (선택) 에러 무시 설정(errors='ignore')이 되어있어 생략 가능하지만, 안전을 위해 생성
+            df_trip['사번'] = np.nan
 
         # 필터링
         df_trip = df_trip[

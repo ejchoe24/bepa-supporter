@@ -250,11 +250,17 @@
             <input type="file" id="tag_file" name="tag_file" required>
         </div>
         
-        <p>근무 유형 파일</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <p style="margin: 0;">(선택) 근무 유형 파일</p>
+            <a href="/static/forms/template_type.xlsx" download
+               style="text-decoration: none; background-color: #fff; color: #073d95; padding: 5px 12px; border: 1px solid #073d95; border-radius: 4px; font-size: 0.85rem; font-weight: bold">
+               📥 양식 다운로드
+            </a>
+        </div>
         <div class="file-box">
             <input class="upload-name" value="첨부된 파일 없음" placeholder="첨부된 파일 없음" readonly>
-            <label for="type_file">파일 찾기</label> 
-            <input type="file" id="type_file" name="type_file" required>
+            <label for="type_file">파일 찾기</label>
+            <input type="file" id="type_file" name="type_file">
         </div>
         
         <button type="submit">업로드</button>
